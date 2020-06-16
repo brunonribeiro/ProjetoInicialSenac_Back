@@ -1,4 +1,5 @@
-﻿using EmpresaApp.Domain.Entitys;
+﻿using EmpresaApp.Domain.Attributes;
+using EmpresaApp.Domain.Entitys;
 using EmpresaApp.Domain.Utils;
 using System.ComponentModel.DataAnnotations;
 
@@ -11,9 +12,12 @@ namespace EmpresaApp.Domain.Dto
         public string Nome { get; set; }
 
         [Display(Name = "CPF")]
+        [CPF(ErrorMessage = ErrorMsg.Invalid)]
+        [Required(ErrorMessage = ErrorMsg.Required)]
         public string Cpf { get; set; }
 
         [Display(Name = "Data da Contratação")]
+        [Date(ErrorMessage = ErrorMsg.Invalid)]
         public string DataContratacao { get; set; }
 
         [Display(Name = "Empresa")]

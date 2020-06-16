@@ -1,4 +1,5 @@
-﻿using EmpresaApp.Domain.Entitys;
+﻿using EmpresaApp.Domain.Attributes;
+using EmpresaApp.Domain.Entitys;
 using EmpresaApp.Domain.Utils;
 using System.ComponentModel.DataAnnotations;
 
@@ -11,9 +12,12 @@ namespace EmpresaApp.Domain.Dto
         public string Nome { get; set; }
 
         [Display(Name = "CNPJ")]
+        [CNPJ(ErrorMessage = ErrorMsg.Invalid)]
+        [Required(ErrorMessage = ErrorMsg.Required)]
         public string Cnpj { get; set; }
 
         [Display(Name = "Data da Fundação")]
+        [Date(ErrorMessage = ErrorMsg.Invalid)]
         public string DataFundacao { get; set; }
 
         public static EmpresaDto ConvertEntityToDto(Empresa entity)
