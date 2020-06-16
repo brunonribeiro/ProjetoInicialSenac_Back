@@ -1,6 +1,7 @@
 ﻿using EmpresaApp.Domain.Dto;
 using EmpresaApp.Domain.Entitys;
 using EmpresaApp.Domain.Interfaces;
+using System;
 using System.Collections.Generic;
 
 namespace EmpresaApp.Domain.Services
@@ -34,6 +35,20 @@ namespace EmpresaApp.Domain.Services
         public void Save(FuncionarioDto dto)
         {
             _serviceDefault.Save(dto, Funcionario.Create, _repository.Save);
+        }
+
+        public void AddCargo(FuncionarioDto dto)
+        {
+            var entity = _repository.GetById(dto.Id);
+
+            if (entity.EmpresaId != null)
+            {
+                entity.Update(dto);
+            }
+            else
+            {
+                throw new ArgumentException("O funcionário precisa estar vinculado a uma empresa para atribuir um cargo. ");
+            }
         }
     }
 }

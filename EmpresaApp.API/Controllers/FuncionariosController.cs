@@ -14,9 +14,14 @@ namespace EmpresaApp.API.Controllers
     public class FuncionariosController : ControllerBase
     {
         private readonly FuncionarioService _funcionarioService;
-        public FuncionariosController(FuncionarioService funcionarioService)
+        private readonly EmpresaService _empresaService;
+        private readonly CargoService _cargoService;
+
+        public FuncionariosController(FuncionarioService funcionarioService, EmpresaService empresaService, CargoService cargoService)
         {
             _funcionarioService = funcionarioService;
+            _empresaService = empresaService;
+            _cargoService = cargoService;
         }
 
         // GET: api/funcionarios
@@ -91,6 +96,38 @@ namespace EmpresaApp.API.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Problema ao excluir o funcionário informado");
             }
+        }
+
+        // PUT api/funcionarios/5/vincularempresa/8
+        [HttpPut("{id}/vincularempresa/{idEmpresa}")]
+        public void VincularEmpresa(int id, int idEmpresa)
+        {
+            var funcionario = _funcionarioService.GetById(id);
+            if(funcionario == null)
+                throw new ArgumentException("O funcionário informado não está cadastrado.");
+
+            var empresa = _empresaService.GetById(idEmpresa);
+            if (empresa == null)
+                throw new ArgumentException("A empresa informada não está cadastrada.");
+
+            funcionario.EmpresaId = idEmpresa;
+            Post(funcionario);
+        }
+
+        // PUT api/funcionarios/5/atribuircargo/8
+        [HttpPut("{id}/atribuircargo/{idCargo}")]
+        public void AtribuirCargo(int id, int idCargo)
+        {
+            var funcionario = _funcionarioService.GetById(id);
+            if (funcionario == null)
+                throw new ArgumentException("O funcionário informado não está cadastrado.");
+
+            var cargo = _cargoService.GetById(idCargo);
+            if (cargo == null)
+                throw new ArgumentException("O cargo informado não está cadastrado.");
+
+            funcionario.CargoId = idCargo;
+            _funcionarioService.AddCargo(funcionario);
         }
     }
 }
