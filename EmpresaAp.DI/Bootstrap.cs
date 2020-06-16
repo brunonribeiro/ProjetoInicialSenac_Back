@@ -4,7 +4,7 @@ using EmpresaApp.Domain.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace EmpresaAp.DI
+namespace EmpresaApp.DI
 {
     public class Bootstrap
     {

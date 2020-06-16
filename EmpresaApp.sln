@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmpresaApp.Domain", "Empres
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmpresaApp.Data", "EmpresaApp.Data\EmpresaApp.Data.csproj", "{23FF6B3C-5291-4CFB-974C-980837746619}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmpresaAp.DI", "EmpresaAp.DI\EmpresaAp.DI.csproj", "{EC5ECD1A-0012-450B-BE13-2183A7820C98}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmpresaApp.DI", "EmpresaAp.DI\EmpresaApp.DI.csproj", "{EC5ECD1A-0012-450B-BE13-2183A7820C98}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
