@@ -29,7 +29,7 @@ namespace EmpresaApp.Domain.Dto
                     Id = entity.Id,
                     Nome = entity.Nome,
                     Cnpj = entity.Cnpj,
-                    DataFundacao = entity.DataFundacao.ToShortDateString()
+                    DataFundacao = entity.DataFundacao?.ToShortDateString()
                 };
             }
 

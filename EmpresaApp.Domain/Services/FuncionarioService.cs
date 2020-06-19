@@ -3,6 +3,7 @@ using EmpresaApp.Domain.Entitys;
 using EmpresaApp.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace EmpresaApp.Domain.Services
 {
@@ -22,9 +23,9 @@ namespace EmpresaApp.Domain.Services
             return _serviceDefault.GetById(id);
         }
 
-        public List<FuncionarioDto> List()
+        public List<FuncionarioListarDto> List()
         {
-            return _serviceDefault.List(_repository.List);
+            return _repository.List("Empresa", "Cargo").Select(FuncionarioListarDto.ConvertEntityToDto).ToList();
         }
 
         public bool Remove(int? id)

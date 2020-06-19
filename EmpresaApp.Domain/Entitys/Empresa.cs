@@ -8,7 +8,7 @@ namespace EmpresaApp.Domain.Entitys
     {
         public string Nome { get; set; }
         public string Cnpj { get; set; }
-        public DateTime DataFundacao { get; set; }
+        public DateTime? DataFundacao { get; set; }
         
         public static Empresa Create(EmpresaDto dto)
         {
