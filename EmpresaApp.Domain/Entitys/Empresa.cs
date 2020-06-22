@@ -21,7 +21,7 @@ namespace EmpresaApp.Domain.Entitys
         {
             Nome = dto.Nome;
             Cnpj = dto.Cnpj;
-            DataFundacao = dto.DataFundacao.ToDate();
+            DataFundacao = dto.DataFundacao?.ToDate();
         }
     }
 }

@@ -10,11 +10,15 @@ namespace EmpresaApp.Domain.Services
     public class FuncionarioService
     {
         private readonly IRepository<Funcionario> _repository;
+        private readonly IRepository<Empresa> _repositoryEmpresa;
+        private readonly IRepository<Cargo> _repositoryCargo;
         private readonly ServiceDefault<FuncionarioDto, Funcionario> _serviceDefault;
 
-        public FuncionarioService(IRepository<Funcionario> repository)
+        public FuncionarioService(IRepository<Funcionario> repository, IRepository<Empresa> repositoryEmpresa, IRepository<Cargo> repositoryCargo)
         {
             _repository = repository;
+            _repositoryEmpresa = repositoryEmpresa;
+            _repositoryCargo = repositoryCargo;
             _serviceDefault = new ServiceDefault<FuncionarioDto, Funcionario>(FuncionarioDto.ConvertEntityToDto, _repository.GetById);
         }
 
@@ -38,17 +42,42 @@ namespace EmpresaApp.Domain.Services
             _serviceDefault.Save(dto, Funcionario.Create, _repository.Save);
         }
 
-        public void AddCargo(FuncionarioDto dto)
+        public void AddEmpresa(int funcionarioId, int empresaId)
         {
-            var entity = _repository.GetById(dto.Id);
+            var entity = _repository.GetById(funcionarioId);
 
-            if (entity.EmpresaId != null)
+            if (entity != null)
             {
-                entity.Update(dto);
+                var empresa = _repositoryEmpresa.GetById(empresaId);
+                if (empresa == null)
+                    throw new ArgumentException("A empresa informada não está cadastrada.");
+
+                entity.EmpresaId = empresaId;
             }
             else
             {
-                throw new ArgumentException("O funcionário precisa estar vinculado a uma empresa para atribuir um cargo. ");
+                throw new ArgumentException("O funcionário informado não está cadastrado. ");
+            }
+        }
+
+        public void AddCargo(int funcionarioId, int cargoId)
+        {
+            var entity = _repository.GetById(funcionarioId);
+
+            if (entity != null)
+            {
+                if (entity.EmpresaId == null)
+                    throw new ArgumentException("O funcionário precisa estar vinculado a uma empresa para atribuir um cargo. ");
+
+                var cargo = _repositoryCargo.GetById(cargoId);
+                if (cargo == null)
+                    throw new ArgumentException("O cargo informado não está cadastrado.");
+
+                entity.CargoId = cargoId;
+            }
+            else
+            {
+                throw new ArgumentException("O funcionário informado não está cadastrado. ");
             }
         }
     }

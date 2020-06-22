@@ -10,7 +10,7 @@ namespace EmpresaApp.Domain.Entitys
     {
         public string Nome { get; set; }
         public string Cpf { get; set; }
-        public DateTime DataContratacao { get; set; }
+        public DateTime? DataContratacao { get; set; }
         public int? EmpresaId { get; set; }
         public Empresa Empresa { get; set; }
         public int? CargoId { get; set; }
@@ -27,9 +27,7 @@ namespace EmpresaApp.Domain.Entitys
         {
             Nome = dto.Nome;
             Cpf = dto.Cpf;
-            DataContratacao = dto.DataContratacao.ToDate();
-            EmpresaId = dto.EmpresaId;
-            CargoId = dto.CargoId;
+            DataContratacao = dto.DataContratacao?.ToDate();
         }
     }
 }

@@ -14,14 +14,10 @@ namespace EmpresaApp.API.Controllers
     public class FuncionariosController : ControllerBase
     {
         private readonly FuncionarioService _funcionarioService;
-        private readonly EmpresaService _empresaService;
-        private readonly CargoService _cargoService;
 
-        public FuncionariosController(FuncionarioService funcionarioService, EmpresaService empresaService, CargoService cargoService)
+        public FuncionariosController(FuncionarioService funcionarioService)
         {
             _funcionarioService = funcionarioService;
-            _empresaService = empresaService;
-            _cargoService = cargoService;
         }
 
         // GET: api/funcionarios
@@ -102,32 +98,14 @@ namespace EmpresaApp.API.Controllers
         [HttpPut("{id}/vincularempresa/{idEmpresa}")]
         public void VincularEmpresa(int id, int idEmpresa)
         {
-            var funcionario = _funcionarioService.GetById(id);
-            if(funcionario == null)
-                throw new ArgumentException("O funcionário informado não está cadastrado.");
-
-            var empresa = _empresaService.GetById(idEmpresa);
-            if (empresa == null)
-                throw new ArgumentException("A empresa informada não está cadastrada.");
-
-            funcionario.EmpresaId = idEmpresa;
-            Post(funcionario);
+            _funcionarioService.AddEmpresa(id, idEmpresa);
         }
 
         // PUT api/funcionarios/5/atribuircargo/8
         [HttpPut("{id}/atribuircargo/{idCargo}")]
         public void AtribuirCargo(int id, int idCargo)
         {
-            var funcionario = _funcionarioService.GetById(id);
-            if (funcionario == null)
-                throw new ArgumentException("O funcionário informado não está cadastrado.");
-
-            var cargo = _cargoService.GetById(idCargo);
-            if (cargo == null)
-                throw new ArgumentException("O cargo informado não está cadastrado.");
-
-            funcionario.CargoId = idCargo;
-            _funcionarioService.AddCargo(funcionario);
+            _funcionarioService.AddCargo(id, idCargo); ;
         }
     }
 }

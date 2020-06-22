@@ -23,7 +23,7 @@ namespace EmpresaApp.Domain.Dto
                     Id = entity.Id,
                     Nome = entity.Nome,
                     Cpf = entity.Cpf,
-                    DataContratacao = entity.DataContratacao.ToShortDateString(),
+                    DataContratacao = entity.DataContratacao?.ToShortDateString(),
                     Empresa = entity.Empresa?.Nome,
                     Cargo = entity.Cargo?.Descricao
                 };
