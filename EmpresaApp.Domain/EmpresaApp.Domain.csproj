@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation.AspNetCore" Version="8.6.2" />
     <PackageReference Include="xunit.extensibility.core" Version="2.4.1" />
     <PackageReference Include="xunit.extensibility.execution" Version="2.4.1" />
   </ItemGroup>

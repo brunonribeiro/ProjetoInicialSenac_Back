@@ -2,7 +2,7 @@
 {
     public abstract class Entity<TDto>
     {
-        public int Id { get; protected set; }
+        public int Id { get; private set; }
 
         public abstract void Update(TDto dto);
     }

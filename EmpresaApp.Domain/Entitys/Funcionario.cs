@@ -1,33 +1,64 @@
-﻿using EmpresaApp.Domain.Dto;
-using EmpresaApp.Domain.Utils;
+﻿using EmpresaApp.Domain.Utils;
+using FluentValidation;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace EmpresaApp.Domain.Entitys
 {
-    public class Funcionario : Entity<FuncionarioDto>
+    public class Funcionario : EntityBase<int, Funcionario>
     {
-        public string Nome { get; set; }
-        public string Cpf { get; set; }
-        public DateTime? DataContratacao { get; set; }
-        public int? EmpresaId { get; set; }
-        public Empresa Empresa { get; set; }
-        public int? CargoId { get; set; }
-        public Cargo Cargo { get; set; }
+        public string Nome { get; private set; }
+        public string Cpf { get; private set; }
+        public DateTime? DataContratacao { get; private set; }
+        public int? EmpresaId { get; private set; }
+        public Empresa Empresa { get; private set; }
+        public int? CargoId { get; private set; }
+        public Cargo Cargo { get; private set; }
 
-        public static Funcionario Create(FuncionarioDto dto)
+        public Funcionario(string nome, string cpf)
         {
-            var entity = new Funcionario();
-            entity.Update(dto);
-            return entity;
+            Nome = nome;
+            Cpf = cpf;
         }
 
-        public override void Update(FuncionarioDto dto)
+        public override bool Validar()
         {
-            Nome = dto.Nome;
-            Cpf = dto.Cpf;
-            DataContratacao = dto.DataContratacao?.ToDate();
+            RuleFor(p => p.Nome)
+               .NotEmpty()
+               .NotNull();
+
+            RuleFor(p => p.Cpf)
+                .NotEmpty()
+                .NotNull()
+               .MinimumLength(Constantes.QuantidadeDeCaracteres11)
+               .MaximumLength(Constantes.QuantidadeDeCaracteres11);
+
+            ValidationResult = Validate(this);
+            return ValidationResult.IsValid;
+        }
+
+        public void AlterarNome(string nome)
+        {
+            Nome = nome?.Trim();
+        }
+
+        public void AlterarCpf(string cpf)
+        {
+            Cpf = cpf.Trim().Replace(".", "").Replace("-", "");
+        }
+
+        public void AlterarDataContratacao(string dataContratacao)
+        {
+            DataContratacao = dataContratacao.ToDate();
+        }
+
+        public void AlterarCargo(int cargoId)
+        {
+            CargoId = cargoId;
+        }
+
+        public void AlterarEmpresa(int empresaId)
+        {
+            EmpresaId = empresaId;
         }
     }
 }

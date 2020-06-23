@@ -1,21 +1,27 @@
-﻿using EmpresaApp.Domain.Dto;
+﻿using FluentValidation;
 
 namespace EmpresaApp.Domain.Entitys
 {
-    public class Cargo : Entity<CargoDto>
+    public class Cargo : EntityBase<int, Cargo>
     {
-        public string Descricao { get; set; }
+        public string Descricao { get; private set; }
 
-        public static Cargo Create(CargoDto dto)
+        public Cargo(string descricao)
         {
-            var entity = new Cargo();
-            entity.Update(dto);
-            return entity;
+            Descricao = descricao?.Trim();
         }
 
-        public override void Update(CargoDto dto)
+        public override bool Validar()
         {
-            Descricao = dto.Descricao;
+            RuleFor(x => x.Descricao).NotEmpty().NotNull();
+
+            ValidationResult = Validate(this);
+            return ValidationResult.IsValid;
+        }
+
+        public void AlterarDescricao(string descricao)
+        {
+            Descricao = descricao?.Trim();
         }
     }
 }

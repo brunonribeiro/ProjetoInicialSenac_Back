@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using EmpresaApp.Domain.Dto;
-using EmpresaApp.Domain.Services;
+using EmpresaApp.Domain.Entitys;
+using EmpresaApp.Domain.Interfaces;
+using EmpresaApp.Domain.Services.Exclusoes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,10 +12,18 @@ namespace EmpresaApp.API.Controllers
     [ApiController]
     public class CargosController : ControllerBase
     {
-        private readonly CargoService _cargoService;
-        public CargosController(CargoService cargoService)
+        private readonly IArmazenadorDeCargo _armazenadorDeCargo;
+        private readonly ExclusaoDeCargo _exclusaoDeCargo;
+        private readonly IRepository<Cargo> _cargoRepositorio;
+
+        public CargosController (
+            IArmazenadorDeCargo armazenadorDeCargo, 
+            ExclusaoDeCargo exclusaoDeCargo, 
+            IRepository<Cargo> cargoRepositorio)
         {
-            _cargoService = cargoService;
+            _armazenadorDeCargo = armazenadorDeCargo;
+            _exclusaoDeCargo = exclusaoDeCargo;
+            _cargoRepositorio = cargoRepositorio;
         }
 
         // GET: api/cargos
@@ -25,7 +32,7 @@ namespace EmpresaApp.API.Controllers
         {
             try
             {
-                var results = _cargoService.List();
+                var results = _cargoRepositorio.List();
                 return Ok(results);
             }
             catch (Exception)
@@ -40,7 +47,7 @@ namespace EmpresaApp.API.Controllers
         {
             try
             {
-                var result = _cargoService.GetById(id);
+                var result = _cargoRepositorio.GetById(id);
                 return Ok(result);
             }
             catch (Exception)
@@ -55,7 +62,7 @@ namespace EmpresaApp.API.Controllers
         {
             if (ModelState.IsValid)
             {
-                _cargoService.Save(dto);
+                _armazenadorDeCargo.Armazenar(dto);
             }
             else
             {
@@ -67,7 +74,7 @@ namespace EmpresaApp.API.Controllers
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] CargoDto dto)
         {
-            var result = _cargoService.GetById(id);
+            var result = _cargoRepositorio.GetById(id);
             if (result != null)
             {
                 dto.Id = id;
@@ -85,11 +92,12 @@ namespace EmpresaApp.API.Controllers
         {
             try
             {
-                return Ok(_cargoService.Remove(id));
+                _exclusaoDeCargo.Excluir(id);
+                return Ok(true);
             }
             catch (Exception)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Problema ao excluir o cargo informado");
+                return StatusCode(StatusCodes.Status400BadRequest, "Problema ao excluir o cargo informado");
             }
         }
     }

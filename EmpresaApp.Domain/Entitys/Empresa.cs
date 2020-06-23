@@ -1,27 +1,49 @@
-﻿using EmpresaApp.Domain.Dto;
-using EmpresaApp.Domain.Utils;
+﻿using EmpresaApp.Domain.Utils;
+using FluentValidation;
 using System;
 
 namespace EmpresaApp.Domain.Entitys
 {
-    public class Empresa : Entity<EmpresaDto>
+    public class Empresa : EntityBase<int, Empresa>
     {
-        public string Nome { get; set; }
-        public string Cnpj { get; set; }
-        public DateTime? DataFundacao { get; set; }
-        
-        public static Empresa Create(EmpresaDto dto)
+        public string Nome { get; private set; }
+        public string Cnpj { get; private set; }
+        public DateTime? DataFundacao { get; private set; }
+
+        public Empresa(string nome, string cnpj)
         {
-            var entity = new Empresa();
-            entity.Update(dto);
-            return entity;
+            Nome = nome;
+            Cnpj = cnpj;
+        }
+        public override bool Validar()
+        {
+            RuleFor(p => p.Nome)
+             .NotEmpty()
+             .NotNull();
+
+            RuleFor(p => p.Cnpj)
+                .NotEmpty()
+                .NotNull()
+               .MinimumLength(Constantes.QuantidadeDeCaracteres14)
+               .MaximumLength(Constantes.QuantidadeDeCaracteres14);
+
+            ValidationResult = Validate(this);
+            return ValidationResult.IsValid;
         }
 
-        public override void Update(EmpresaDto dto)
+        public void AlterarNome(string nome)
         {
-            Nome = dto.Nome;
-            Cnpj = dto.Cnpj;
-            DataFundacao = dto.DataFundacao?.ToDate();
+            Nome = nome.Trim();
         }
+        public void AlterarCnpj(string cnpj)
+        {
+            Cnpj = cnpj.Trim().Replace(".", "").Replace("-", "").Replace("/", "");
+        }
+
+        public void AlterarDataFundacao(string dataFundacao)
+        {
+            DataFundacao = dataFundacao.ToDate();
+        }
+
     }
 }

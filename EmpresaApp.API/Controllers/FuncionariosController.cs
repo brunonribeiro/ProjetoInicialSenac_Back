@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EmpresaApp.Domain.Dto;
+using EmpresaApp.Domain.Entitys;
+using EmpresaApp.Domain.Interfaces;
 using EmpresaApp.Domain.Services;
+using EmpresaApp.Domain.Services.Exclusoes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,11 +16,18 @@ namespace EmpresaApp.API.Controllers
     [ApiController]
     public class FuncionariosController : ControllerBase
     {
-        private readonly FuncionarioService _funcionarioService;
+        private readonly IArmazenadorDeFuncionario _armazenadorDeFuncionario;
+        private readonly ExclusaoDeFuncionario _exclusaoDeFuncionario;
+        private readonly IRepository<Funcionario> _funcionarioRepositorio;
 
-        public FuncionariosController(FuncionarioService funcionarioService)
+        public FuncionariosController(
+            IArmazenadorDeFuncionario armazenadorDeFuncionario, 
+            ExclusaoDeFuncionario exclusaoDeFuncionario, 
+            IRepository<Funcionario> funcionarioRepositorio)
         {
-            _funcionarioService = funcionarioService;
+            _armazenadorDeFuncionario = armazenadorDeFuncionario;
+            _exclusaoDeFuncionario = exclusaoDeFuncionario;
+            _funcionarioRepositorio = funcionarioRepositorio;
         }
 
         // GET: api/funcionarios
@@ -26,7 +36,7 @@ namespace EmpresaApp.API.Controllers
         {
             try
             {
-                var results = _funcionarioService.List();
+                var results = _funcionarioRepositorio.List();
                 return Ok(results);
             }
             catch (Exception)
@@ -41,7 +51,7 @@ namespace EmpresaApp.API.Controllers
         {
             try
             {
-                var result = _funcionarioService.GetById(id);
+                var result = _funcionarioRepositorio.GetById(id);
                 return Ok(result);
             }
             catch (Exception)
@@ -56,7 +66,7 @@ namespace EmpresaApp.API.Controllers
         {
             if (ModelState.IsValid)
             {
-                _funcionarioService.Save(dto);
+                _armazenadorDeFuncionario.Armazenar(dto);
             }
             else
             {
@@ -68,7 +78,7 @@ namespace EmpresaApp.API.Controllers
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] FuncionarioDto dto)
         {
-            var result = _funcionarioService.GetById(id);
+            var result = _funcionarioRepositorio.GetById(id);
             if (result != null)
             {
                 dto.Id = id;
@@ -86,7 +96,8 @@ namespace EmpresaApp.API.Controllers
         {
             try
             {
-                return Ok(_funcionarioService.Remove(id));
+                _exclusaoDeFuncionario.Excluir(id);
+                return Ok(true);
             }
             catch (Exception)
             {
@@ -98,14 +109,14 @@ namespace EmpresaApp.API.Controllers
         [HttpPut("{id}/vincularempresa/{idEmpresa}")]
         public void VincularEmpresa(int id, int idEmpresa)
         {
-            _funcionarioService.AddEmpresa(id, idEmpresa);
+            _armazenadorDeFuncionario.AdicionarEmpresa(id, idEmpresa);
         }
 
         // PUT api/funcionarios/5/atribuircargo/8
         [HttpPut("{id}/atribuircargo/{idCargo}")]
         public void AtribuirCargo(int id, int idCargo)
         {
-            _funcionarioService.AddCargo(id, idCargo); ;
+            _armazenadorDeFuncionario.AdicionarCargo(id, idCargo); ;
         }
     }
 }

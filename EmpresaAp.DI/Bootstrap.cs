@@ -1,6 +1,8 @@
 ﻿using EmpresaApp.Data;
 using EmpresaApp.Domain.Interfaces;
-using EmpresaApp.Domain.Services;
+using EmpresaApp.Domain.Services.Armazenadores;
+using EmpresaApp.Domain.Services.Exclusoes;
+using FuncionarioApp.Domain.Services.Armazenadores;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,9 +16,14 @@ namespace EmpresaApp.DI
             services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
             services.AddTransient(typeof(IUnitOfWork), typeof(UnitOfWork));
 
-            services.AddTransient(typeof(EmpresaService));
-            services.AddTransient(typeof(FuncionarioService));
-            services.AddTransient(typeof(CargoService));
+            services.AddTransient(typeof(IArmazenadorDeFuncionario), typeof(ArmazenadorDeFuncionario));
+            services.AddTransient(typeof(IArmazenadorDeCargo), typeof(ArmazenadorDeCargo));
+            services.AddTransient(typeof(IArmazenadorDeEmpresa), typeof(ArmazenadorDeEmpresa));
+
+            services.AddTransient(typeof(ExclusaoDeCargo));
+            services.AddTransient(typeof(ExclusaoDeEmpresa));
+            services.AddTransient(typeof(ExclusaoDeFuncionario));
+
         }
     }
 }

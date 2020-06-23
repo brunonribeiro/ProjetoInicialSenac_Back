@@ -1,6 +1,9 @@
 ﻿using System;
 using EmpresaApp.Domain.Dto;
+using EmpresaApp.Domain.Entitys;
+using EmpresaApp.Domain.Interfaces;
 using EmpresaApp.Domain.Services;
+using EmpresaApp.Domain.Services.Exclusoes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,10 +13,18 @@ namespace EmpresaApp.API.Controllers
     [ApiController]
     public class EmpresasController : ControllerBase
     {
-        private readonly EmpresaService _empresaService;
-        public EmpresasController(EmpresaService empresaService)
+        private readonly IArmazenadorDeEmpresa _armazenadorDeEmpresa;
+        private readonly ExclusaoDeEmpresa _exclusaoDeEmpresa;
+        private readonly IRepository<Empresa> _empresaRepositorio;
+
+        public EmpresasController(
+            IArmazenadorDeEmpresa armazenadorDeEmpresa, 
+            ExclusaoDeEmpresa exclusaoDeEmpresa, 
+            IRepository<Empresa> empresaRepositorio)
         {
-            _empresaService = empresaService;
+            _armazenadorDeEmpresa = armazenadorDeEmpresa;
+            _exclusaoDeEmpresa = exclusaoDeEmpresa;
+            _empresaRepositorio = empresaRepositorio;
         }
 
         // GET: api/empresas
@@ -22,7 +33,7 @@ namespace EmpresaApp.API.Controllers
         {
             try
             {
-                var results = _empresaService.List();
+                var results = _empresaRepositorio.List();
                 return Ok(results);
             }
             catch (Exception)
@@ -37,7 +48,7 @@ namespace EmpresaApp.API.Controllers
         {
             try
             {
-                var result = _empresaService.GetById(id);
+                var result = _empresaRepositorio.GetById(id);
                 return Ok(result);
             }
             catch (Exception)
@@ -52,7 +63,7 @@ namespace EmpresaApp.API.Controllers
         {
             if (ModelState.IsValid)
             {
-                _empresaService.Save(dto);
+                _armazenadorDeEmpresa.Armazenar(dto);
             }
             else
             {
@@ -64,7 +75,7 @@ namespace EmpresaApp.API.Controllers
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] EmpresaDto dto)
         {
-            var result = _empresaService.GetById(id);
+            var result = _empresaRepositorio.GetById(id);
             if (result != null)
             {
                 dto.Id = id;
@@ -82,11 +93,12 @@ namespace EmpresaApp.API.Controllers
         {
             try
             {
-                return Ok(_empresaService.Remove(id));
+                _exclusaoDeEmpresa.Excluir(id);
+                return Ok(true);
             }
             catch (Exception)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Problema ao excluir a empresa informada");
+                return StatusCode(StatusCodes.Status400BadRequest, "Problema ao excluir a empresa informada");
             }
         }
     }
