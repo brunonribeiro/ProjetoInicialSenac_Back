@@ -1,18 +1,19 @@
 ﻿using EmpresaApp.Domain.Utils;
 using FluentValidation;
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EmpresaApp.Domain.Entitys
 {
-    public class Funcionario : EntityBase<int, Funcionario>
+    public class Funcionario : Entity<int, Funcionario>
     {
         public string Nome { get; private set; }
         public string Cpf { get; private set; }
         public DateTime? DataContratacao { get; private set; }
         public int? EmpresaId { get; private set; }
-        public Empresa Empresa { get; private set; }
+        public virtual Empresa Empresa { get; private set; }
         public int? CargoId { get; private set; }
-        public Cargo Cargo { get; private set; }
+        public virtual Cargo Cargo { get; private set; }
 
         public Funcionario(string nome, string cpf)
         {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using EmpresaApp.Domain.Dto;
 using EmpresaApp.Domain.Entitys;
 using EmpresaApp.Domain.Interfaces;
@@ -33,10 +34,10 @@ namespace EmpresaApp.API.Controllers
         {
             try
             {
-                var results = _empresaRepositorio.List();
+                var results = _empresaRepositorio.List().Select(EmpresaDto.ConvertEntityToDto);
                 return Ok(results);
             }
-            catch (Exception)
+            catch
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Problema ao recuperar a lista de empresas");
             }
@@ -48,7 +49,7 @@ namespace EmpresaApp.API.Controllers
         {
             try
             {
-                var result = _empresaRepositorio.GetById(id);
+                var result = EmpresaDto.ConvertEntityToDto(_empresaRepositorio.GetById(id));
                 return Ok(result);
             }
             catch (Exception)

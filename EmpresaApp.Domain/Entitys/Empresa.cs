@@ -4,7 +4,7 @@ using System;
 
 namespace EmpresaApp.Domain.Entitys
 {
-    public class Empresa : EntityBase<int, Empresa>
+    public class Empresa : Entity<int, Empresa>
     {
         public string Nome { get; private set; }
         public string Cnpj { get; private set; }

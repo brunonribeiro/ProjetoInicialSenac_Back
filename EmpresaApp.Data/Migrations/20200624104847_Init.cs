@@ -14,7 +14,7 @@ namespace EmpresaApp.Data.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Descricao = table.Column<string>(nullable: true)
+                    Descricao = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -27,9 +27,9 @@ namespace EmpresaApp.Data.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Nome = table.Column<string>(nullable: true),
-                    Cnpj = table.Column<string>(nullable: true),
-                    DataFundacao = table.Column<DateTime>(nullable: false)
+                    Nome = table.Column<string>(nullable: false),
+                    Cnpj = table.Column<string>(nullable: false),
+                    DataFundacao = table.Column<DateTime>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -42,9 +42,9 @@ namespace EmpresaApp.Data.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Nome = table.Column<string>(nullable: true),
-                    Cpf = table.Column<string>(nullable: true),
-                    DataContratacao = table.Column<DateTime>(nullable: false),
+                    Nome = table.Column<string>(nullable: false),
+                    Cpf = table.Column<string>(nullable: false),
+                    DataContratacao = table.Column<DateTime>(nullable: true),
                     EmpresaId = table.Column<int>(nullable: true),
                     CargoId = table.Column<int>(nullable: true)
                 },

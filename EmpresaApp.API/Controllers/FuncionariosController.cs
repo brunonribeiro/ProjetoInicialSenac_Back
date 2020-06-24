@@ -36,10 +36,10 @@ namespace EmpresaApp.API.Controllers
         {
             try
             {
-                var results = _funcionarioRepositorio.List();
+                var results = _funcionarioRepositorio.List().Select(FuncionarioListarDto.ConvertEntityToDto);
                 return Ok(results);
             }
-            catch (Exception)
+            catch
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Problema ao recuperar a lista de funcionários");
             }
@@ -51,7 +51,7 @@ namespace EmpresaApp.API.Controllers
         {
             try
             {
-                var result = _funcionarioRepositorio.GetById(id);
+                var result = FuncionarioDto.ConvertEntityToDto(_funcionarioRepositorio.GetById(id));
                 return Ok(result);
             }
             catch (Exception)

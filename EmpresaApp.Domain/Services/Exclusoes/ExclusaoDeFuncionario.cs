@@ -8,6 +8,11 @@ namespace EmpresaApp.Domain.Services.Exclusoes
     {
         private readonly IRepository<Funcionario> _repository;
 
+        public ExclusaoDeFuncionario(IRepository<Funcionario> repository)
+        {
+            _repository = repository;
+        }
+
         public void Excluir(int id)
         {
             var funcionario = _repository.GetById(id);

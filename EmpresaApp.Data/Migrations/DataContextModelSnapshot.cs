@@ -25,7 +25,8 @@ namespace EmpresaApp.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Descricao");
+                    b.Property<string>("Descricao")
+                        .IsRequired();
 
                     b.HasKey("Id");
 
@@ -38,11 +39,13 @@ namespace EmpresaApp.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Cnpj");
+                    b.Property<string>("Cnpj")
+                        .IsRequired();
 
                     b.Property<DateTime?>("DataFundacao");
 
-                    b.Property<string>("Nome");
+                    b.Property<string>("Nome")
+                        .IsRequired();
 
                     b.HasKey("Id");
 
@@ -57,13 +60,15 @@ namespace EmpresaApp.Data.Migrations
 
                     b.Property<int?>("CargoId");
 
-                    b.Property<string>("Cpf");
+                    b.Property<string>("Cpf")
+                        .IsRequired();
 
                     b.Property<DateTime?>("DataContratacao");
 
                     b.Property<int?>("EmpresaId");
 
-                    b.Property<string>("Nome");
+                    b.Property<string>("Nome")
+                        .IsRequired();
 
                     b.HasKey("Id");
 

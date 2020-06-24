@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using EmpresaApp.Domain.Dto;
 using EmpresaApp.Domain.Entitys;
 using EmpresaApp.Domain.Interfaces;
@@ -16,9 +17,9 @@ namespace EmpresaApp.API.Controllers
         private readonly ExclusaoDeCargo _exclusaoDeCargo;
         private readonly IRepository<Cargo> _cargoRepositorio;
 
-        public CargosController (
-            IArmazenadorDeCargo armazenadorDeCargo, 
-            ExclusaoDeCargo exclusaoDeCargo, 
+        public CargosController(
+            IArmazenadorDeCargo armazenadorDeCargo,
+            ExclusaoDeCargo exclusaoDeCargo,
             IRepository<Cargo> cargoRepositorio)
         {
             _armazenadorDeCargo = armazenadorDeCargo;
@@ -32,7 +33,7 @@ namespace EmpresaApp.API.Controllers
         {
             try
             {
-                var results = _cargoRepositorio.List();
+                var results = _cargoRepositorio.List().Select(CargoDto.ConvertEntityToDto);
                 return Ok(results);
             }
             catch (Exception)
@@ -47,7 +48,7 @@ namespace EmpresaApp.API.Controllers
         {
             try
             {
-                var result = _cargoRepositorio.GetById(id);
+                var result = CargoDto.ConvertEntityToDto(_cargoRepositorio.GetById(id));
                 return Ok(result);
             }
             catch (Exception)

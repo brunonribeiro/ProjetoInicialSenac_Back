@@ -12,12 +12,15 @@ namespace EmpresaApp.Domain.Base
 
         public void NotificarValidacoesDeDominio(ValidationResult validationResult)
         {
-            var erroFinal = new StringBuilder();
+            if (validationResult.Errors.Count > 0)
+            {
+                var erroFinal = new StringBuilder();
 
-            foreach (var erro in validationResult.Errors)
-                erroFinal.AppendLine(erro.ErrorMessage);
+                foreach (var erro in validationResult.Errors)
+                    erroFinal.AppendLine(erro.ErrorMessage);
 
-            throw new ArgumentException(erroFinal.ToString());
+                throw new ArgumentException(erroFinal.ToString());
+            }
         }
 
         public void NotificarValidacoesDoArmazenador(string mensagem)

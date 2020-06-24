@@ -2,7 +2,7 @@
 
 namespace EmpresaApp.Domain.Entitys
 {
-    public class Cargo : EntityBase<int, Cargo>
+    public class Cargo : Entity<int, Cargo>
     {
         public string Descricao { get; private set; }
 
