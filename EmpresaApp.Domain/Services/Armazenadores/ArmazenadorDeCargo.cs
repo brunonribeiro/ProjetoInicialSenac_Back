@@ -1,49 +1,47 @@
 ﻿using EmpresaApp.Domain.Base;
 using EmpresaApp.Domain.Dto;
 using EmpresaApp.Domain.Entitys;
-using EmpresaApp.Domain.Interfaces;
+using EmpresaApp.Domain.Interfaces.Armazenadores;
+using EmpresaApp.Domain.Interfaces.Repositorios;
 using EmpresaApp.Domain.Utils;
-using System;
-using System.Linq;
+using System.Threading.Tasks;
 
 namespace EmpresaApp.Domain.Services.Armazenadores
 {
     public class ArmazenadorDeCargo : DomainService, IArmazenadorDeCargo
     {
-        private readonly IRepository<Cargo> _repository;
+        private readonly ICargoRepositorio _cargoRepositorio;
 
-        public ArmazenadorDeCargo(IRepository<Cargo> repository)
+        public ArmazenadorDeCargo(ICargoRepositorio cargoRepositorio)
         {
-            _repository = repository;
+            _cargoRepositorio = cargoRepositorio;
         }
 
-        public Cargo Armazenar(CargoDto dto)
+        public async Task Armazenar(CargoDto dto)
         {
-            ValidarCargoComMesmaDescricao(dto);
+            await ValidarCargoComMesmaDescricao(dto);
 
             var cargo = new Cargo(dto.Descricao);
 
             if (dto.Id > 0)
             {
-                cargo = _repository.GetById(dto.Id);
+                cargo = await _cargoRepositorio.ObterPorIdAsync(dto.Id);
                 cargo.AlterarDescricao(dto.Descricao);
             }
 
             if (cargo.Validar() && cargo.Id == 0)
             {
-                _repository.Save(cargo);
+                await _cargoRepositorio.AdicionarAsync(cargo);
             }
             else
             {
                 NotificarValidacoesDeDominio(cargo.ValidationResult);
             }
-
-            return cargo;
         }
 
-        private void ValidarCargoComMesmaDescricao(CargoDto dto)
+        private async Task ValidarCargoComMesmaDescricao(CargoDto dto)
         {
-            var cargoComMesmaDescricao = _repository.Get(x => x.Descricao == dto.Descricao).FirstOrDefault();
+            var cargoComMesmaDescricao = await _cargoRepositorio.ObterPorDescricaoAsync(dto.Descricao);
 
             if (cargoComMesmaDescricao != null && cargoComMesmaDescricao.Id != dto.Id)
                 NotificarValidacoesDoArmazenador(CommonResources.MsgDominioComMesmoNomeNoMasculino);

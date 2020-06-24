@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using EmpresaApp.Domain.Dto;
-using EmpresaApp.Domain.Entitys;
-using EmpresaApp.Domain.Interfaces;
-using EmpresaApp.Domain.Services;
+using EmpresaApp.Domain.Interfaces.Armazenadores;
+using EmpresaApp.Domain.Interfaces.Repositorios;
 using EmpresaApp.Domain.Services.Exclusoes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,12 +16,12 @@ namespace EmpresaApp.API.Controllers
     {
         private readonly IArmazenadorDeEmpresa _armazenadorDeEmpresa;
         private readonly ExclusaoDeEmpresa _exclusaoDeEmpresa;
-        private readonly IRepository<Empresa> _empresaRepositorio;
+        private readonly IEmpresaRepositorio _empresaRepositorio;
 
         public EmpresasController(
             IArmazenadorDeEmpresa armazenadorDeEmpresa, 
-            ExclusaoDeEmpresa exclusaoDeEmpresa, 
-            IRepository<Empresa> empresaRepositorio)
+            ExclusaoDeEmpresa exclusaoDeEmpresa,
+            IEmpresaRepositorio empresaRepositorio)
         {
             _armazenadorDeEmpresa = armazenadorDeEmpresa;
             _exclusaoDeEmpresa = exclusaoDeEmpresa;
@@ -30,12 +30,12 @@ namespace EmpresaApp.API.Controllers
 
         // GET: api/empresas
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
             try
             {
-                var results = _empresaRepositorio.List().Select(EmpresaDto.ConvertEntityToDto);
-                return Ok(results);
+                var results = await _empresaRepositorio.ListarAsync();
+                return Ok(results.Select(EmpresaDto.ConvertEntityToDto));
             }
             catch
             {
@@ -45,12 +45,12 @@ namespace EmpresaApp.API.Controllers
 
         // GET api/empresas/5
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
             try
             {
-                var result = EmpresaDto.ConvertEntityToDto(_empresaRepositorio.GetById(id));
-                return Ok(result);
+                var result = await _empresaRepositorio.ObterPorIdAsync(id);
+                return Ok(EmpresaDto.ConvertEntityToDto(result));
             }
             catch (Exception)
             {
@@ -60,27 +60,21 @@ namespace EmpresaApp.API.Controllers
 
         // POST api/empresas
         [HttpPost]
-        public void Post([FromBody] EmpresaDto dto)
+        public async Task<IActionResult> Post([FromBody] EmpresaDto dto)
         {
-            if (ModelState.IsValid)
-            {
-                _armazenadorDeEmpresa.Armazenar(dto);
-            }
-            else
-            {
-                throw new ArgumentException("O objeto informado está inválido.");
-            }
+            await _armazenadorDeEmpresa.Armazenar(dto);
+            return Ok(true);
         }
 
         // PUT api/empresas/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] EmpresaDto dto)
+        public async Task Put(int id, [FromBody] EmpresaDto dto)
         {
-            var result = _empresaRepositorio.GetById(id);
+            var result = await _empresaRepositorio.ObterPorIdAsync(id);
             if (result != null)
             {
                 dto.Id = id;
-                Post(dto);
+                await Post(dto);
             }
             else
             {
@@ -90,11 +84,11 @@ namespace EmpresaApp.API.Controllers
 
         // DELETE api/empresas/5
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                _exclusaoDeEmpresa.Excluir(id);
+                await  _exclusaoDeEmpresa.Excluir(id);
                 return Ok(true);
             }
             catch (Exception)

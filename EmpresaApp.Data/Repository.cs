@@ -1,60 +1,49 @@
-﻿using EmpresaApp.Domain.Interfaces;
+﻿using EmpresaApp.Domain.Entitys;
+using EmpresaApp.Domain.Interfaces.Gerais;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace EmpresaApp.Data
 {
-    public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
+    public class Repository<TId, TEntity> :
+        IReadOnlyRepositoryAsync<TId, TEntity>, 
+        IWriteOnlyRepository<TEntity>
+        where TId : struct
+        where TEntity : Entity<TId, TEntity>
     {
         private readonly DataContext _context;
+        private readonly DbSet<TEntity> _dbSet;
 
         public Repository(DataContext context)
         {
-            _context = context;
-        }
+            _dbSet = context.Set<TEntity>();
+        }     
 
-        public List<TEntity> Get(Func<TEntity, bool> filtro, params string[] predicate)
-        {
-            return List(predicate).Where(filtro).ToList();
-        }
+        public async Task AdicionarAsync(TEntity obj) => await _dbSet.AddAsync(obj);
+        public void Adicionar(TEntity obj) => _dbSet.Add(obj);
 
-        public TEntity GetById(int id)
-        {
-            return _context.Set<TEntity>().Find(id);
-        }
+        public void Atualizar(TEntity obj) => _dbSet.Update(obj);
 
-        public List<TEntity> List()
-        {
-            return _context.Set<TEntity>().ToList();
-        }
+        public void Remover(TEntity obj) => _dbSet.Remove(obj);
 
-        public List<TEntity> List(params string[] predicate)
-        {
-            IQueryable<TEntity> query = _context.Set<TEntity>();
+        public async Task<IEnumerable<TEntity>> ListarAsyncAsNoTracking() => await _dbSet.AsNoTracking().ToListAsync();
 
-            foreach (var item in predicate)
-            {
-                query = query.Include(item);
-            }
+        public async Task<IEnumerable<TEntity>> BuscarAsync(Expression<Func<TEntity, bool>> predicate) =>
+            await _dbSet.Where(predicate).ToListAsync();
 
-            return query.ToList();
-        }
+        public async Task<IEnumerable<TEntity>> BuscarAsyncAsNoTracking(Expression<Func<TEntity, bool>> predicate) =>
+            await _dbSet.AsNoTracking().Where(predicate).ToListAsync();
 
-        public void Remove(TEntity entity)
-        {
-            _context.Set<TEntity>().Remove(entity);
-        }
+        public async Task<TEntity> ObterPorIdAsyncAsNoTracking(TId id) =>
+            await _dbSet.AsNoTracking().FirstOrDefaultAsync(e => EqualityComparer<TId>.Default.Equals(e.Id, id));
 
-        public void RemoveRange(List<TEntity> entity)
-        {
-            _context.Set<TEntity>().RemoveRange(entity);
-        }
+        public async Task<IEnumerable<TEntity>> ListarAsync() => await _dbSet.ToListAsync();
 
-        public void Save(TEntity entity)
-        {
-            _context.Set<TEntity>().Add(entity);
-        }
+        public async Task<TEntity> ObterPorIdAsync(TId id) =>
+            await _dbSet.FirstOrDefaultAsync(e => EqualityComparer<TId>.Default.Equals(e.Id, id));
     }
 }

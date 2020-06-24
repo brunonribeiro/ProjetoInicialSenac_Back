@@ -1,22 +1,22 @@
 ﻿using EmpresaApp.Domain.Base;
-using EmpresaApp.Domain.Entitys;
-using EmpresaApp.Domain.Interfaces;
+using EmpresaApp.Domain.Interfaces.Repositorios;
+using System.Threading.Tasks;
 
 namespace EmpresaApp.Domain.Services.Exclusoes
 {
     public class ExclusaoDeEmpresa : DomainService
     {
-        private readonly IRepository<Empresa> _repository;
+        private readonly IEmpresaRepositorio _empresaRepositorio;
 
-        public ExclusaoDeEmpresa(IRepository<Empresa> repository)
+        public ExclusaoDeEmpresa(IEmpresaRepositorio empresaRepositorio)
         {
-            _repository = repository;
+            _empresaRepositorio = empresaRepositorio;
         }
 
-        public void Excluir(int id)
+        public async Task Excluir(int id)
         {
-            var empresa = _repository.GetById(id);
-            _repository.Remove(empresa);
+            var empresa = await _empresaRepositorio.ObterPorIdAsync(id);
+            _empresaRepositorio.Remover(empresa);
         }
     }
 }

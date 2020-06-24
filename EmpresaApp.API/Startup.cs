@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using EmpresaApp.DI;
 using EmpresaApp.Domain.Interfaces;
+using EmpresaApp.Domain.Interfaces.Gerais;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;

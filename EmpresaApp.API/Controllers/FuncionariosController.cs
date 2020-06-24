@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using EmpresaApp.Domain.Dto;
 using EmpresaApp.Domain.Entitys;
 using EmpresaApp.Domain.Interfaces;
+using EmpresaApp.Domain.Interfaces.Armazenadores;
+using EmpresaApp.Domain.Interfaces.Repositorios;
 using EmpresaApp.Domain.Services;
 using EmpresaApp.Domain.Services.Exclusoes;
 using Microsoft.AspNetCore.Http;
@@ -18,12 +20,12 @@ namespace EmpresaApp.API.Controllers
     {
         private readonly IArmazenadorDeFuncionario _armazenadorDeFuncionario;
         private readonly ExclusaoDeFuncionario _exclusaoDeFuncionario;
-        private readonly IRepository<Funcionario> _funcionarioRepositorio;
+        private readonly IFuncionarioRepositorio _funcionarioRepositorio;
 
         public FuncionariosController(
-            IArmazenadorDeFuncionario armazenadorDeFuncionario, 
-            ExclusaoDeFuncionario exclusaoDeFuncionario, 
-            IRepository<Funcionario> funcionarioRepositorio)
+            IArmazenadorDeFuncionario armazenadorDeFuncionario,
+            ExclusaoDeFuncionario exclusaoDeFuncionario,
+            IFuncionarioRepositorio funcionarioRepositorio)
         {
             _armazenadorDeFuncionario = armazenadorDeFuncionario;
             _exclusaoDeFuncionario = exclusaoDeFuncionario;
@@ -32,12 +34,12 @@ namespace EmpresaApp.API.Controllers
 
         // GET: api/funcionarios
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
             try
             {
-                var results = _funcionarioRepositorio.List().Select(FuncionarioListarDto.ConvertEntityToDto);
-                return Ok(results);
+                var results = await _funcionarioRepositorio.ObterListaFuncionarioComEmpresaECargo();
+                return Ok(results.Select(FuncionarioListarDto.ConvertEntityToDto));
             }
             catch
             {
@@ -47,12 +49,12 @@ namespace EmpresaApp.API.Controllers
 
         // GET api/funcionarios/5
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
             try
             {
-                var result = FuncionarioDto.ConvertEntityToDto(_funcionarioRepositorio.GetById(id));
-                return Ok(result);
+                var funcionario = await _funcionarioRepositorio.ObterPorIdAsync(id);
+                return Ok(FuncionarioDto.ConvertEntityToDto(funcionario));
             }
             catch (Exception)
             {
@@ -62,27 +64,21 @@ namespace EmpresaApp.API.Controllers
 
         // POST api/funcionarios
         [HttpPost]
-        public void Post([FromBody] FuncionarioDto dto)
+        public async Task<IActionResult> Post([FromBody] FuncionarioDto dto)
         {
-            if (ModelState.IsValid)
-            {
-                _armazenadorDeFuncionario.Armazenar(dto);
-            }
-            else
-            {
-                throw new ArgumentException("O objeto informado está inválido.");
-            }
+            await _armazenadorDeFuncionario.Armazenar(dto);
+            return Ok(true);
         }
 
         // PUT api/funcionarios/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] FuncionarioDto dto)
+        public async Task Put(int id, [FromBody] FuncionarioDto dto)
         {
-            var result = _funcionarioRepositorio.GetById(id);
-            if (result != null)
+            var funcionario = await _funcionarioRepositorio.ObterPorIdAsync(id);
+            if (funcionario != null)
             {
                 dto.Id = id;
-                Post(dto);
+                await Post(dto);
             }
             else
             {
@@ -92,11 +88,11 @@ namespace EmpresaApp.API.Controllers
 
         // DELETE api/funcionarios/5
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                _exclusaoDeFuncionario.Excluir(id);
+                await _exclusaoDeFuncionario.Excluir(id);
                 return Ok(true);
             }
             catch (Exception)
@@ -107,16 +103,16 @@ namespace EmpresaApp.API.Controllers
 
         // PUT api/funcionarios/5/vincularempresa/8
         [HttpPut("{id}/vincularempresa/{idEmpresa}")]
-        public void VincularEmpresa(int id, int idEmpresa)
+        public async Task VincularEmpresa(int id, int idEmpresa)
         {
-            _armazenadorDeFuncionario.AdicionarEmpresa(id, idEmpresa);
+            await _armazenadorDeFuncionario.AdicionarEmpresa(id, idEmpresa);
         }
 
         // PUT api/funcionarios/5/atribuircargo/8
         [HttpPut("{id}/atribuircargo/{idCargo}")]
-        public void AtribuirCargo(int id, int idCargo)
+        public async Task AtribuirCargo(int id, int idCargo)
         {
-            _armazenadorDeFuncionario.AdicionarCargo(id, idCargo); ;
+            await _armazenadorDeFuncionario.AdicionarCargo(id, idCargo); ;
         }
     }
 }

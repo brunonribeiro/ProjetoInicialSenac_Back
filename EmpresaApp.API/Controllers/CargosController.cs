@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using EmpresaApp.Domain.Dto;
-using EmpresaApp.Domain.Entitys;
-using EmpresaApp.Domain.Interfaces;
+using EmpresaApp.Domain.Interfaces.Armazenadores;
+using EmpresaApp.Domain.Interfaces.Repositorios;
 using EmpresaApp.Domain.Services.Exclusoes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,12 +16,12 @@ namespace EmpresaApp.API.Controllers
     {
         private readonly IArmazenadorDeCargo _armazenadorDeCargo;
         private readonly ExclusaoDeCargo _exclusaoDeCargo;
-        private readonly IRepository<Cargo> _cargoRepositorio;
+        private readonly ICargoRepositorio _cargoRepositorio;
 
         public CargosController(
             IArmazenadorDeCargo armazenadorDeCargo,
             ExclusaoDeCargo exclusaoDeCargo,
-            IRepository<Cargo> cargoRepositorio)
+            ICargoRepositorio cargoRepositorio)
         {
             _armazenadorDeCargo = armazenadorDeCargo;
             _exclusaoDeCargo = exclusaoDeCargo;
@@ -29,12 +30,12 @@ namespace EmpresaApp.API.Controllers
 
         // GET: api/cargos
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
             try
             {
-                var results = _cargoRepositorio.List().Select(CargoDto.ConvertEntityToDto);
-                return Ok(results);
+                var results = await _cargoRepositorio.ListarAsync();
+                return Ok(results.Select(CargoDto.ConvertEntityToDto));
             }
             catch (Exception)
             {
@@ -44,12 +45,12 @@ namespace EmpresaApp.API.Controllers
 
         // GET api/cargos/5
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
             try
             {
-                var result = CargoDto.ConvertEntityToDto(_cargoRepositorio.GetById(id));
-                return Ok(result);
+                var cargo = await _cargoRepositorio.ObterPorIdAsync(id);
+                return Ok(CargoDto.ConvertEntityToDto(cargo));
             }
             catch (Exception)
             {
@@ -59,27 +60,21 @@ namespace EmpresaApp.API.Controllers
 
         // POST api/cargos
         [HttpPost]
-        public void Post([FromBody] CargoDto dto)
+        public async Task<IActionResult> Post([FromBody] CargoDto dto)
         {
-            if (ModelState.IsValid)
-            {
-                _armazenadorDeCargo.Armazenar(dto);
-            }
-            else
-            {
-                throw new ArgumentException("O objeto informado está inválido.");
-            }
+            await _armazenadorDeCargo.Armazenar(dto);
+            return Ok(true);
         }
 
         // PUT api/cargos/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] CargoDto dto)
+        public async Task Put(int id, [FromBody] CargoDto dto)
         {
-            var result = _cargoRepositorio.GetById(id);
-            if (result != null)
+            var cargo = await _cargoRepositorio.ObterPorIdAsync(id);
+            if (cargo != null)
             {
                 dto.Id = id;
-                Post(dto);
+                await Post(dto);
             }
             else
             {
@@ -89,11 +84,11 @@ namespace EmpresaApp.API.Controllers
 
         // DELETE api/cargos/5
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                _exclusaoDeCargo.Excluir(id);
+                await _exclusaoDeCargo.Excluir(id);
                 return Ok(true);
             }
             catch (Exception)

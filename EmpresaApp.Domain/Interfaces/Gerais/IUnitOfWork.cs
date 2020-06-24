@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace EmpresaApp.Domain.Interfaces
+namespace EmpresaApp.Domain.Interfaces.Gerais
 {
     public interface IUnitOfWork
     {

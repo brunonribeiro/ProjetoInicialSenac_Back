@@ -1,31 +1,31 @@
 ﻿using EmpresaApp.Domain.Base;
 using EmpresaApp.Domain.Dto;
 using EmpresaApp.Domain.Entitys;
-using EmpresaApp.Domain.Interfaces;
+using EmpresaApp.Domain.Interfaces.Armazenadores;
+using EmpresaApp.Domain.Interfaces.Repositorios;
 using EmpresaApp.Domain.Utils;
-using System;
-using System.Linq;
+using System.Threading.Tasks;
 
 namespace EmpresaApp.Domain.Services.Armazenadores
 {
     public class ArmazenadorDeEmpresa : DomainService, IArmazenadorDeEmpresa
     {
-        private readonly IRepository<Empresa> _repository;
+        private readonly IEmpresaRepositorio _empresaRepositorio;
 
-        public ArmazenadorDeEmpresa(IRepository<Empresa> repository)
+        public ArmazenadorDeEmpresa(IEmpresaRepositorio empresaRepositorio)
         {
-            _repository = repository;
+            _empresaRepositorio = empresaRepositorio;
         }
 
-        public Empresa Armazenar(EmpresaDto dto)
+        public async Task Armazenar(EmpresaDto dto)
         {
-            ValidarEmpresaComMesmoNome(dto);
+            await ValidarEmpresaComMesmoNome(dto);
 
             var empresa = new Empresa(dto.Nome, dto.Cnpj);
 
             if (dto.Id > 0)
             {
-                empresa = _repository.GetById(dto.Id);
+                empresa = await _empresaRepositorio.ObterPorIdAsync(dto.Id);
                 empresa.AlterarNome(dto.Nome);
                 empresa.AlterarCnpj(dto.Cnpj);
             }
@@ -34,19 +34,17 @@ namespace EmpresaApp.Domain.Services.Armazenadores
 
             if (empresa.Validar() && empresa.Id == 0)
             {
-                _repository.Save(empresa);
+                await _empresaRepositorio.AdicionarAsync(empresa);
             }
             else
             {
                 NotificarValidacoesDeDominio(empresa.ValidationResult);
             }
-
-            return empresa;
         }
 
-        private void ValidarEmpresaComMesmoNome(EmpresaDto dto)
+        private async Task ValidarEmpresaComMesmoNome(EmpresaDto dto)
         {
-            var empresaComMesmaNome = _repository.Get(x => x.Nome == dto.Nome).FirstOrDefault();
+            var empresaComMesmaNome = await _empresaRepositorio.ObterPorNomeAsync(dto.Nome);
 
             if (empresaComMesmaNome != null && empresaComMesmaNome.Id != dto.Id)
                 NotificarValidacoesDoArmazenador(CommonResources.MsgDominioComMesmoNomeNoFeminino);

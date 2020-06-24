@@ -1,5 +1,5 @@
 ﻿
-using EmpresaApp.Domain.Interfaces;
+using EmpresaApp.Domain.Interfaces.Gerais;
 using System.Threading.Tasks;
 
 namespace EmpresaApp.Data
