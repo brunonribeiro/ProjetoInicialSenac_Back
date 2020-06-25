@@ -87,7 +87,7 @@ namespace FuncionarioApp.Domain.Services.Armazenadores
             var funcionarioComMesmaNome = await _funcionarioRepositorio.ObterPorNomeAsync(dto.Nome);
 
             if (funcionarioComMesmaNome != null && funcionarioComMesmaNome.Id != dto.Id)
-                await NotificarValidacaoDeServico(CommonResources.MsgDominioComMesmoNomeNoMasculino);
+                await NotificarValidacaoDeServico(string.Format(CommonResources.MsgDominioComMesmoNomeNoMasculino, CommonResources.FuncionarioDominio));
         }
 
         private async Task ValidarFuncionaroNaoCadastrado(Funcionario funcionario)

@@ -55,7 +55,7 @@ namespace EmpresaApp.Domain.Services.Armazenadores
             var empresaComMesmaNome = await _empresaRepositorio.ObterPorNomeAsync(dto.Nome);
 
             if (empresaComMesmaNome != null && empresaComMesmaNome.Id != dto.Id)
-                await NotificarValidacaoDeServico(CommonResources.MsgDominioComMesmoNomeNoFeminino);
+                await NotificarValidacaoDeServico(string.Format(CommonResources.MsgDominioComMesmoNomeNoFeminino, CommonResources.EmpresaDominio));
         }
     }
 }
