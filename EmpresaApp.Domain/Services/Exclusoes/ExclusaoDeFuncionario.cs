@@ -1,7 +1,7 @@
 ﻿using EmpresaApp.Domain.Base;
-using EmpresaApp.Domain.Entitys;
 using EmpresaApp.Domain.Interfaces.Gerais;
 using EmpresaApp.Domain.Interfaces.Repositorios;
+using EmpresaApp.Domain.Notifications;
 using System.Threading.Tasks;
 
 namespace EmpresaApp.Domain.Services.Exclusoes
@@ -10,7 +10,9 @@ namespace EmpresaApp.Domain.Services.Exclusoes
     {
         private readonly IFuncionarioRepositorio _funcionarioRepositorio;
 
-        public ExclusaoDeFuncionario(IFuncionarioRepositorio funcionarioRepositorio)
+        public ExclusaoDeFuncionario(IFuncionarioRepositorio funcionarioRepositorio,
+            IDomainNotificationHandlerAsync<DomainNotification> notificacaoDeDominio) : 
+            base(notificacaoDeDominio)
         {
             _funcionarioRepositorio = funcionarioRepositorio;
         }

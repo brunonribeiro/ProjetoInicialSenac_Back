@@ -1,32 +1,28 @@
-﻿using FluentValidation.Results;
-using System;
-using System.Text;
+﻿using EmpresaApp.Domain.Interfaces.Gerais;
+using EmpresaApp.Domain.Notifications;
+using FluentValidation.Results;
+using System.Threading.Tasks;
 
 namespace EmpresaApp.Domain.Base
 {
-    public abstract class DomainService
+    public abstract class DomainService 
     {
-        protected DomainService()
+        protected readonly IDomainNotificationHandlerAsync<DomainNotification> NotificacaoDeDominio;
+
+        protected DomainService(IDomainNotificationHandlerAsync<DomainNotification> notificacaoDeDominio)
         {
+            NotificacaoDeDominio = notificacaoDeDominio;
         }
 
-        public void NotificarValidacoesDeDominio(ValidationResult validationResult)
+        public async Task NotificarValidacoesDeDominio(ValidationResult validationResult)
         {
-            if (validationResult.Errors.Count > 0)
-            {
-                var erroFinal = new StringBuilder();
-
-                foreach (var erro in validationResult.Errors)
-                    erroFinal.AppendLine(erro.ErrorMessage);
-
-                throw new ArgumentException(erroFinal.ToString());
-            }
+            foreach (var erro in validationResult.Errors)
+                await NotificacaoDeDominio.HandleAsync(new DomainNotification(TipoDeNotificacao.ErroDeDominio.ToString(), erro.ErrorMessage));
         }
 
-        public void NotificarValidacoesDoArmazenador(string mensagem)
+        public async Task NotificarValidacaoDeServico(string mensagem)
         {
-            throw new ArgumentException(mensagem);
+            await NotificacaoDeDominio.HandleAsync(new DomainNotification(TipoDeNotificacao.ErroDeServico.ToString(), mensagem));
         }
-
     }
 }

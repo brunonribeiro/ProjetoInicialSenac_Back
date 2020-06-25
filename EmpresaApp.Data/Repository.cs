@@ -15,7 +15,6 @@ namespace EmpresaApp.Data
         where TId : struct
         where TEntity : Entity<TId, TEntity>
     {
-        private readonly DataContext _context;
         private readonly DbSet<TEntity> _dbSet;
 
         public Repository(DataContext context)

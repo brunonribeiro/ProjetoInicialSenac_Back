@@ -3,7 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using EmpresaApp.Domain.Dto;
 using EmpresaApp.Domain.Interfaces.Armazenadores;
+using EmpresaApp.Domain.Interfaces.Gerais;
 using EmpresaApp.Domain.Interfaces.Repositorios;
+using EmpresaApp.Domain.Notifications;
 using EmpresaApp.Domain.Services.Exclusoes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,16 +14,18 @@ namespace EmpresaApp.API.Controllers
 {
     [Route("api/empresas")]
     [ApiController]
-    public class EmpresasController : ControllerBase
+    public class EmpresasController : BaseController
     {
         private readonly IArmazenadorDeEmpresa _armazenadorDeEmpresa;
         private readonly ExclusaoDeEmpresa _exclusaoDeEmpresa;
         private readonly IEmpresaRepositorio _empresaRepositorio;
 
         public EmpresasController(
-            IArmazenadorDeEmpresa armazenadorDeEmpresa, 
+            IArmazenadorDeEmpresa armazenadorDeEmpresa,
             ExclusaoDeEmpresa exclusaoDeEmpresa,
-            IEmpresaRepositorio empresaRepositorio)
+            IEmpresaRepositorio empresaRepositorio,
+            IDomainNotificationHandlerAsync<DomainNotification> notificacaoDeDominio) :
+            base(notificacaoDeDominio)
         {
             _armazenadorDeEmpresa = armazenadorDeEmpresa;
             _exclusaoDeEmpresa = exclusaoDeEmpresa;
@@ -63,6 +67,10 @@ namespace EmpresaApp.API.Controllers
         public async Task<IActionResult> Post([FromBody] EmpresaDto dto)
         {
             await _armazenadorDeEmpresa.Armazenar(dto);
+
+            if (!OperacaoValida())
+                return BadRequestResponse();
+
             return Ok(true);
         }
 
@@ -86,15 +94,12 @@ namespace EmpresaApp.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            try
-            {
-                await  _exclusaoDeEmpresa.Excluir(id);
-                return Ok(true);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, "Problema ao excluir a empresa informada");
-            }
+            await _exclusaoDeEmpresa.Excluir(id);
+
+            if (!OperacaoValida())
+                return BadRequestResponse();
+
+            return Ok(true);
         }
     }
 }

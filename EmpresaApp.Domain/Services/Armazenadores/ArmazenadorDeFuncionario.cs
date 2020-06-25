@@ -2,7 +2,9 @@
 using EmpresaApp.Domain.Dto;
 using EmpresaApp.Domain.Entitys;
 using EmpresaApp.Domain.Interfaces.Armazenadores;
+using EmpresaApp.Domain.Interfaces.Gerais;
 using EmpresaApp.Domain.Interfaces.Repositorios;
+using EmpresaApp.Domain.Notifications;
 using EmpresaApp.Domain.Utils;
 using System.Threading.Tasks;
 
@@ -17,35 +19,39 @@ namespace FuncionarioApp.Domain.Services.Armazenadores
         public ArmazenadorDeFuncionario(
             IFuncionarioRepositorio funcionarioRepositorio,
             IEmpresaRepositorio empresaRepositorio,
-            ICargoRepositorio cargoRepositorio)
+            ICargoRepositorio cargoRepositorio,
+            IDomainNotificationHandlerAsync<DomainNotification> notificacaoDeDominio) :
+            base(notificacaoDeDominio)
         {
             _funcionarioRepositorio = funcionarioRepositorio;
             _empresaRepositorio = empresaRepositorio;
             _cargoRepositorio = cargoRepositorio;
         }
-      
+
         public async Task Armazenar(FuncionarioDto dto)
         {
             await ValidarFuncionarioComMesmoNome(dto);
 
-            var funcionario = new Funcionario(dto.Nome, dto.Cpf);
-
-            if (dto.Id > 0)
+            if (!NotificacaoDeDominio.HasNotifications())
             {
-                funcionario = await _funcionarioRepositorio.ObterPorIdAsync(dto.Id);
-                funcionario.AlterarNome(dto.Nome);
-                funcionario.AlterarCpf(dto.Cpf);
-            }
+                var funcionario = new Funcionario(dto.Nome, dto.Cpf);
+                if (dto.Id > 0)
+                {
+                    funcionario = await _funcionarioRepositorio.ObterPorIdAsync(dto.Id);
+                    funcionario.AlterarNome(dto.Nome);
+                    funcionario.AlterarCpf(dto.Cpf);
+                }
 
-            funcionario.AlterarDataContratacao(dto.DataContratacao);
+                funcionario.AlterarDataContratacao(dto.DataContratacao);
 
-            if (funcionario.Validar() && funcionario.Id == 0)
-            {
-               await _funcionarioRepositorio.AdicionarAsync(funcionario);
-            }
-            else
-            {
-                NotificarValidacoesDeDominio(funcionario.ValidationResult);
+                if (funcionario.Validar() && funcionario.Id == 0)
+                {
+                    await _funcionarioRepositorio.AdicionarAsync(funcionario);
+                }
+                else
+                {
+                    await NotificarValidacoesDeDominio(funcionario.ValidationResult);
+                }
             }
         }
 
@@ -53,54 +59,61 @@ namespace FuncionarioApp.Domain.Services.Armazenadores
         {
             var funcionario = await _funcionarioRepositorio.ObterPorIdAsync(funcionarioId);
 
-            ValidarFuncionaroNaoCadastrado(funcionario);
+            await ValidarFuncionaroNaoCadastrado(funcionario);
             await ValidarEmpresaNaoCadastrada(empresaId);
 
-            funcionario.AlterarEmpresa(empresaId);
+            if (!NotificacaoDeDominio.HasNotifications())
+            {
+                funcionario.AlterarEmpresa(empresaId);
+            }
         }
 
         public async Task AdicionarCargo(int funcionarioId, int cargoId)
         {
             var funcionario = await _funcionarioRepositorio.ObterPorIdAsync(funcionarioId);
 
-            ValidarFuncionaroNaoCadastrado(funcionario);
-            ValidarFuncionaroComEmpresaCadastrada(funcionario);
+            await ValidarFuncionaroNaoCadastrado(funcionario);
+            await ValidarFuncionaroComEmpresaCadastrada(funcionario);
             await ValidarCargoNaoCadastrado(cargoId);
 
-            funcionario.AlterarCargo(funcionarioId);
-        }      
+            if (!NotificacaoDeDominio.HasNotifications())
+            {
+                funcionario.AlterarCargo(cargoId);
+            }
+        }
 
         private async Task ValidarFuncionarioComMesmoNome(FuncionarioDto dto)
         {
             var funcionarioComMesmaNome = await _funcionarioRepositorio.ObterPorNomeAsync(dto.Nome);
 
             if (funcionarioComMesmaNome != null && funcionarioComMesmaNome.Id != dto.Id)
-                NotificarValidacoesDoArmazenador(CommonResources.MsgDominioComMesmoNomeNoMasculino);
+                await NotificarValidacaoDeServico(CommonResources.MsgDominioComMesmoNomeNoMasculino);
         }
 
-        private void ValidarFuncionaroNaoCadastrado(Funcionario funcionario)
+        private async Task ValidarFuncionaroNaoCadastrado(Funcionario funcionario)
         {
             if (funcionario == null)
-                NotificarValidacoesDoArmazenador("O funcionário informado não está cadastrado.");
+                await NotificarValidacaoDeServico("O funcionário informado não está cadastrado.");
         }
 
         private async Task ValidarEmpresaNaoCadastrada(int empresaId)
         {
             var empresa = await _empresaRepositorio.ObterPorIdAsync(empresaId);
             if (empresa == null)
-                NotificarValidacoesDoArmazenador("A empresa informada não está cadastrada.");
+                await NotificarValidacaoDeServico("A empresa informada não está cadastrada.");
         }
 
         private async Task ValidarCargoNaoCadastrado(int cargoId)
         {
             var cargo = await _cargoRepositorio.ObterPorIdAsync(cargoId);
             if (cargo == null)
-                NotificarValidacoesDoArmazenador("O cargo informado não está cadastrado.");
+                await NotificarValidacaoDeServico("O cargo informado não está cadastrado.");
         }
-        private void ValidarFuncionaroComEmpresaCadastrada(Funcionario funcionario)
+
+        private async Task ValidarFuncionaroComEmpresaCadastrada(Funcionario funcionario)
         {
             if (!funcionario.EmpresaId.HasValue)
-                NotificarValidacoesDoArmazenador("O funcionário precisa estar vinculado a uma empresa para atribuir um cargo.");
+                await NotificarValidacaoDeServico("O funcionário precisa estar vinculado a uma empresa para atribuir um cargo.");
         }
 
     }

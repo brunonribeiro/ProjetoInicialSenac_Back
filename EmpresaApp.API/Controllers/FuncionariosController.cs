@@ -6,7 +6,9 @@ using EmpresaApp.Domain.Dto;
 using EmpresaApp.Domain.Entitys;
 using EmpresaApp.Domain.Interfaces;
 using EmpresaApp.Domain.Interfaces.Armazenadores;
+using EmpresaApp.Domain.Interfaces.Gerais;
 using EmpresaApp.Domain.Interfaces.Repositorios;
+using EmpresaApp.Domain.Notifications;
 using EmpresaApp.Domain.Services;
 using EmpresaApp.Domain.Services.Exclusoes;
 using Microsoft.AspNetCore.Http;
@@ -16,7 +18,7 @@ namespace EmpresaApp.API.Controllers
 {
     [Route("api/funcionarios")]
     [ApiController]
-    public class FuncionariosController : ControllerBase
+    public class FuncionariosController : BaseController
     {
         private readonly IArmazenadorDeFuncionario _armazenadorDeFuncionario;
         private readonly ExclusaoDeFuncionario _exclusaoDeFuncionario;
@@ -25,7 +27,9 @@ namespace EmpresaApp.API.Controllers
         public FuncionariosController(
             IArmazenadorDeFuncionario armazenadorDeFuncionario,
             ExclusaoDeFuncionario exclusaoDeFuncionario,
-            IFuncionarioRepositorio funcionarioRepositorio)
+            IFuncionarioRepositorio funcionarioRepositorio,
+            IDomainNotificationHandlerAsync<DomainNotification> notificacaoDeDominio) :
+            base(notificacaoDeDominio)
         {
             _armazenadorDeFuncionario = armazenadorDeFuncionario;
             _exclusaoDeFuncionario = exclusaoDeFuncionario;
@@ -67,6 +71,10 @@ namespace EmpresaApp.API.Controllers
         public async Task<IActionResult> Post([FromBody] FuncionarioDto dto)
         {
             await _armazenadorDeFuncionario.Armazenar(dto);
+
+            if (!OperacaoValida())
+                return BadRequestResponse();
+
             return Ok(true);
         }
 
@@ -90,29 +98,36 @@ namespace EmpresaApp.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            try
-            {
-                await _exclusaoDeFuncionario.Excluir(id);
-                return Ok(true);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Problema ao excluir o funcionário informado");
-            }
+            await _exclusaoDeFuncionario.Excluir(id);
+
+            if (!OperacaoValida())
+                return BadRequestResponse();
+
+            return Ok(true);
         }
 
         // PUT api/funcionarios/5/vincularempresa/8
         [HttpPut("{id}/vincularempresa/{idEmpresa}")]
-        public async Task VincularEmpresa(int id, int idEmpresa)
+        public async Task<IActionResult> VincularEmpresa(int id, int idEmpresa)
         {
             await _armazenadorDeFuncionario.AdicionarEmpresa(id, idEmpresa);
+
+            if (!OperacaoValida())
+                return BadRequestResponse();
+
+            return Ok(true);
         }
 
         // PUT api/funcionarios/5/atribuircargo/8
         [HttpPut("{id}/atribuircargo/{idCargo}")]
-        public async Task AtribuirCargo(int id, int idCargo)
+        public async Task<IActionResult> AtribuirCargo(int id, int idCargo)
         {
-            await _armazenadorDeFuncionario.AdicionarCargo(id, idCargo); ;
+            await _armazenadorDeFuncionario.AdicionarCargo(id, idCargo);
+
+            if (!OperacaoValida())
+                return BadRequestResponse();
+
+            return Ok(true);
         }
     }
 }

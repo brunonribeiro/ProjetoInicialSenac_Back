@@ -2,7 +2,9 @@
 using EmpresaApp.Domain.Dto;
 using EmpresaApp.Domain.Entitys;
 using EmpresaApp.Domain.Interfaces.Armazenadores;
+using EmpresaApp.Domain.Interfaces.Gerais;
 using EmpresaApp.Domain.Interfaces.Repositorios;
+using EmpresaApp.Domain.Notifications;
 using EmpresaApp.Domain.Utils;
 using System.Threading.Tasks;
 
@@ -12,7 +14,10 @@ namespace EmpresaApp.Domain.Services.Armazenadores
     {
         private readonly IEmpresaRepositorio _empresaRepositorio;
 
-        public ArmazenadorDeEmpresa(IEmpresaRepositorio empresaRepositorio)
+        public ArmazenadorDeEmpresa(
+            IEmpresaRepositorio empresaRepositorio,
+            IDomainNotificationHandlerAsync<DomainNotification> notificacaoDeDominio) :
+            base(notificacaoDeDominio)
         {
             _empresaRepositorio = empresaRepositorio;
         }
@@ -23,22 +28,25 @@ namespace EmpresaApp.Domain.Services.Armazenadores
 
             var empresa = new Empresa(dto.Nome, dto.Cnpj);
 
-            if (dto.Id > 0)
+            if (!NotificacaoDeDominio.HasNotifications())
             {
-                empresa = await _empresaRepositorio.ObterPorIdAsync(dto.Id);
-                empresa.AlterarNome(dto.Nome);
-                empresa.AlterarCnpj(dto.Cnpj);
-            }
+                if (dto.Id > 0)
+                {
+                    empresa = await _empresaRepositorio.ObterPorIdAsync(dto.Id);
+                    empresa.AlterarNome(dto.Nome);
+                    empresa.AlterarCnpj(dto.Cnpj);
+                }
 
-            empresa.AlterarDataFundacao(dto.DataFundacao);
+                empresa.AlterarDataFundacao(dto.DataFundacao);
 
-            if (empresa.Validar() && empresa.Id == 0)
-            {
-                await _empresaRepositorio.AdicionarAsync(empresa);
-            }
-            else
-            {
-                NotificarValidacoesDeDominio(empresa.ValidationResult);
+                if (empresa.Validar() && empresa.Id == 0)
+                {
+                    await _empresaRepositorio.AdicionarAsync(empresa);
+                }
+                else
+                {
+                    await NotificarValidacoesDeDominio(empresa.ValidationResult);
+                }
             }
         }
 
@@ -47,7 +55,7 @@ namespace EmpresaApp.Domain.Services.Armazenadores
             var empresaComMesmaNome = await _empresaRepositorio.ObterPorNomeAsync(dto.Nome);
 
             if (empresaComMesmaNome != null && empresaComMesmaNome.Id != dto.Id)
-                NotificarValidacoesDoArmazenador(CommonResources.MsgDominioComMesmoNomeNoFeminino);
+                await NotificarValidacaoDeServico(CommonResources.MsgDominioComMesmoNomeNoFeminino);
         }
     }
 }

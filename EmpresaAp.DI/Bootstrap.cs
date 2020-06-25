@@ -3,6 +3,7 @@ using EmpresaApp.Data.Repositorios;
 using EmpresaApp.Domain.Interfaces.Armazenadores;
 using EmpresaApp.Domain.Interfaces.Gerais;
 using EmpresaApp.Domain.Interfaces.Repositorios;
+using EmpresaApp.Domain.Notifications;
 using EmpresaApp.Domain.Services.Armazenadores;
 using EmpresaApp.Domain.Services.Exclusoes;
 using FuncionarioApp.Domain.Services.Armazenadores;
@@ -16,19 +17,20 @@ namespace EmpresaApp.DI
         public static void Configure(IServiceCollection services, string conection)
         {
             services.AddDbContext<DataContext>(options => options.UseSqlServer(conection));
-            services.AddTransient(typeof(IUnitOfWork), typeof(UnitOfWork));
+            services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
+            services.AddScoped(typeof(IDomainNotificationHandlerAsync<DomainNotification>), typeof(DomainNotificationHandlerAsync));
 
-            services.AddTransient(typeof(IArmazenadorDeFuncionario), typeof(ArmazenadorDeFuncionario));
-            services.AddTransient(typeof(IArmazenadorDeCargo), typeof(ArmazenadorDeCargo));
-            services.AddTransient(typeof(IArmazenadorDeEmpresa), typeof(ArmazenadorDeEmpresa));
+            services.AddScoped(typeof(IArmazenadorDeFuncionario), typeof(ArmazenadorDeFuncionario));
+            services.AddScoped(typeof(IArmazenadorDeCargo), typeof(ArmazenadorDeCargo));
+            services.AddScoped(typeof(IArmazenadorDeEmpresa), typeof(ArmazenadorDeEmpresa));
 
-            services.AddTransient(typeof(IFuncionarioRepositorio), typeof(FuncionarioRepositorio));
-            services.AddTransient(typeof(ICargoRepositorio), typeof(CargoRepositorio));
-            services.AddTransient(typeof(IEmpresaRepositorio), typeof(EmpresaRepositorio));
+            services.AddScoped(typeof(IFuncionarioRepositorio), typeof(FuncionarioRepositorio));
+            services.AddScoped(typeof(ICargoRepositorio), typeof(CargoRepositorio));
+            services.AddScoped(typeof(IEmpresaRepositorio), typeof(EmpresaRepositorio));
 
-            services.AddTransient(typeof(ExclusaoDeFuncionario));
-            services.AddTransient(typeof(ExclusaoDeEmpresa));
-            services.AddTransient(typeof(ExclusaoDeCargo));
+            services.AddScoped(typeof(ExclusaoDeFuncionario));
+            services.AddScoped(typeof(ExclusaoDeEmpresa));
+            services.AddScoped(typeof(ExclusaoDeCargo));
 
         }
     }

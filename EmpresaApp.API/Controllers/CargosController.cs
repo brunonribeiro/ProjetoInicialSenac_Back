@@ -3,7 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using EmpresaApp.Domain.Dto;
 using EmpresaApp.Domain.Interfaces.Armazenadores;
+using EmpresaApp.Domain.Interfaces.Gerais;
 using EmpresaApp.Domain.Interfaces.Repositorios;
+using EmpresaApp.Domain.Notifications;
 using EmpresaApp.Domain.Services.Exclusoes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +14,7 @@ namespace EmpresaApp.API.Controllers
 {
     [Route("api/cargos")]
     [ApiController]
-    public class CargosController : ControllerBase
+    public class CargosController : BaseController
     {
         private readonly IArmazenadorDeCargo _armazenadorDeCargo;
         private readonly ExclusaoDeCargo _exclusaoDeCargo;
@@ -21,7 +23,9 @@ namespace EmpresaApp.API.Controllers
         public CargosController(
             IArmazenadorDeCargo armazenadorDeCargo,
             ExclusaoDeCargo exclusaoDeCargo,
-            ICargoRepositorio cargoRepositorio)
+            ICargoRepositorio cargoRepositorio,
+            IDomainNotificationHandlerAsync<DomainNotification> notificacaoDeDominio) :
+            base(notificacaoDeDominio)
         {
             _armazenadorDeCargo = armazenadorDeCargo;
             _exclusaoDeCargo = exclusaoDeCargo;
@@ -63,6 +67,10 @@ namespace EmpresaApp.API.Controllers
         public async Task<IActionResult> Post([FromBody] CargoDto dto)
         {
             await _armazenadorDeCargo.Armazenar(dto);
+
+            if (!OperacaoValida())
+                return BadRequestResponse();
+
             return Ok(true);
         }
 
@@ -86,15 +94,12 @@ namespace EmpresaApp.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            try
-            {
-                await _exclusaoDeCargo.Excluir(id);
-                return Ok(true);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, "Problema ao excluir o cargo informado");
-            }
+            await _exclusaoDeCargo.Excluir(id);
+
+            if (!OperacaoValida())
+                return BadRequestResponse();
+
+            return Ok(true);
         }
     }
 }

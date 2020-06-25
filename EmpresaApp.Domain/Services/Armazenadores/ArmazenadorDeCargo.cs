@@ -2,7 +2,9 @@
 using EmpresaApp.Domain.Dto;
 using EmpresaApp.Domain.Entitys;
 using EmpresaApp.Domain.Interfaces.Armazenadores;
+using EmpresaApp.Domain.Interfaces.Gerais;
 using EmpresaApp.Domain.Interfaces.Repositorios;
+using EmpresaApp.Domain.Notifications;
 using EmpresaApp.Domain.Utils;
 using System.Threading.Tasks;
 
@@ -12,7 +14,10 @@ namespace EmpresaApp.Domain.Services.Armazenadores
     {
         private readonly ICargoRepositorio _cargoRepositorio;
 
-        public ArmazenadorDeCargo(ICargoRepositorio cargoRepositorio)
+        public ArmazenadorDeCargo(
+            ICargoRepositorio cargoRepositorio, 
+            IDomainNotificationHandlerAsync<DomainNotification> notificacaoDeDominio) :
+            base(notificacaoDeDominio)
         {
             _cargoRepositorio = cargoRepositorio;
         }
@@ -21,21 +26,24 @@ namespace EmpresaApp.Domain.Services.Armazenadores
         {
             await ValidarCargoComMesmaDescricao(dto);
 
-            var cargo = new Cargo(dto.Descricao);
+            if (!NotificacaoDeDominio.HasNotifications())
+            {
+                var cargo = new Cargo(dto.Descricao);
 
-            if (dto.Id > 0)
-            {
-                cargo = await _cargoRepositorio.ObterPorIdAsync(dto.Id);
-                cargo.AlterarDescricao(dto.Descricao);
-            }
+                if (dto.Id > 0)
+                {
+                    cargo = await _cargoRepositorio.ObterPorIdAsync(dto.Id);
+                    cargo.AlterarDescricao(dto.Descricao);
+                }
 
-            if (cargo.Validar() && cargo.Id == 0)
-            {
-                await _cargoRepositorio.AdicionarAsync(cargo);
-            }
-            else
-            {
-                NotificarValidacoesDeDominio(cargo.ValidationResult);
+                if (cargo.Validar() && cargo.Id == 0)
+                {
+                    await _cargoRepositorio.AdicionarAsync(cargo);
+                }
+                else
+                {
+                    await NotificarValidacoesDeDominio(cargo.ValidationResult);
+                }
             }
         }
 
@@ -44,7 +52,7 @@ namespace EmpresaApp.Domain.Services.Armazenadores
             var cargoComMesmaDescricao = await _cargoRepositorio.ObterPorDescricaoAsync(dto.Descricao);
 
             if (cargoComMesmaDescricao != null && cargoComMesmaDescricao.Id != dto.Id)
-                NotificarValidacoesDoArmazenador(CommonResources.MsgDominioComMesmoNomeNoMasculino);
+                await NotificarValidacaoDeServico(string.Format(CommonResources.MsgDominioComMesmoNomeNoMasculino, CommonResources.CargoDominio));
         }
     }
 }

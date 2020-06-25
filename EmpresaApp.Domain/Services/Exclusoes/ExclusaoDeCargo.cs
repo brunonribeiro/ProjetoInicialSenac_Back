@@ -1,5 +1,7 @@
 ﻿using EmpresaApp.Domain.Base;
+using EmpresaApp.Domain.Interfaces.Gerais;
 using EmpresaApp.Domain.Interfaces.Repositorios;
+using EmpresaApp.Domain.Notifications;
 using System.Threading.Tasks;
 
 namespace EmpresaApp.Domain.Services.Exclusoes
@@ -8,7 +10,9 @@ namespace EmpresaApp.Domain.Services.Exclusoes
     {
         private readonly ICargoRepositorio _cargoRepositorio;
 
-        public ExclusaoDeCargo(ICargoRepositorio cargoRepositorio)
+        public ExclusaoDeCargo(ICargoRepositorio cargoRepositorio, 
+            IDomainNotificationHandlerAsync<DomainNotification> notificacaoDeDominio)
+            : base(notificacaoDeDominio)
         {
             _cargoRepositorio = cargoRepositorio;
         }
