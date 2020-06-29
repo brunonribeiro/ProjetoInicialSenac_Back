@@ -11,5 +11,7 @@
         public const string EmpresaDominio = "Empresa";
         public const string FuncionarioDominio = "Funcionário";
 
+        public const string OrdemDesc = "desc";
+
     }
 }

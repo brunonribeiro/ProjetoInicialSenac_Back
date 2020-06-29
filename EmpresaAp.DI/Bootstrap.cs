@@ -32,6 +32,8 @@ namespace EmpresaApp.DI
             services.AddScoped(typeof(ExclusaoDeEmpresa));
             services.AddScoped(typeof(ExclusaoDeCargo));
 
+            services.AddScoped(typeof(IConsultaBase<,>), typeof(ConsultaBase<,>));
+
         }
     }
 }

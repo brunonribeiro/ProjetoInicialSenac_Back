@@ -1,16 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using EmpresaApp.API.Models;
+using EmpresaApp.Domain.Base;
 using EmpresaApp.Domain.Dto;
 using EmpresaApp.Domain.Entitys;
-using EmpresaApp.Domain.Interfaces;
 using EmpresaApp.Domain.Interfaces.Armazenadores;
 using EmpresaApp.Domain.Interfaces.Gerais;
 using EmpresaApp.Domain.Interfaces.Repositorios;
 using EmpresaApp.Domain.Notifications;
-using EmpresaApp.Domain.Services;
 using EmpresaApp.Domain.Services.Exclusoes;
+using EmpresaApp.Domain.Specification;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,17 +23,20 @@ namespace EmpresaApp.API.Controllers
         private readonly IArmazenadorDeFuncionario _armazenadorDeFuncionario;
         private readonly ExclusaoDeFuncionario _exclusaoDeFuncionario;
         private readonly IFuncionarioRepositorio _funcionarioRepositorio;
+        private readonly IConsultaBase<Funcionario, FuncionarioDto> _consultaBase;
 
         public FuncionariosController(
             IArmazenadorDeFuncionario armazenadorDeFuncionario,
             ExclusaoDeFuncionario exclusaoDeFuncionario,
             IFuncionarioRepositorio funcionarioRepositorio,
-            IDomainNotificationHandlerAsync<DomainNotification> notificacaoDeDominio) :
+            IDomainNotificationHandlerAsync<DomainNotification> notificacaoDeDominio, 
+            IConsultaBase<Funcionario, FuncionarioDto> consultaBase) :
             base(notificacaoDeDominio)
         {
             _armazenadorDeFuncionario = armazenadorDeFuncionario;
             _exclusaoDeFuncionario = exclusaoDeFuncionario;
             _funcionarioRepositorio = funcionarioRepositorio;
+            _consultaBase = consultaBase;
         }
 
         // GET: api/funcionarios
@@ -64,6 +67,18 @@ namespace EmpresaApp.API.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Problema ao recuperar o funcionário informado");
             }
+        }
+
+        [HttpGet("filtro")]
+        public ResultadoDaConsultaBase Get([FromQuery] Filtro filtro)
+        {
+            return _consultaBase.Consultar(ListarFuncionarioSpecificationBuilder.Novo()
+                .ComNome(filtro.Nome)
+                .ComPagina(filtro.Pagina)
+                .ComTamanhoDaPagina(filtro.TamanhoDaPagina)
+                .ComOrdemPor(filtro.OrdenarPor)
+                .ComOrdem(filtro.Ordem)
+                .Build());
         }
 
         // POST api/funcionarios

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using EmpresaApp.DI;
-using EmpresaApp.Domain.Interfaces;
+﻿using EmpresaApp.DI;
+using EmpresaApp.Domain.AutoMapper;
 using EmpresaApp.Domain.Interfaces.Gerais;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -26,6 +22,7 @@ namespace EmpresaApp.API
         public void ConfigureServices(IServiceCollection services)
         {
             Bootstrap.Configure(services, Configuration.GetConnectionString("EmpresaAppContext"));
+            AutoMapperConfiguration.Initialize();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddCors();
         }
