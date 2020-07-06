@@ -9,5 +9,7 @@ namespace EmpresaApp.Domain.Interfaces.Repositorios
     {
         Task<IEnumerable<Funcionario>> ObterListaFuncionarioComEmpresaECargo();
         Task<Funcionario> ObterPorNomeAsync(string nome);
+        Task<Funcionario> ObterPorCargoIdAsync(int cargoId);
+        Task<Funcionario> ObterPorEmpresaIdAsync(int empresaId);
     }
 }

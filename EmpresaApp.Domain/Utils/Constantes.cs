@@ -10,5 +10,6 @@
     {
         public const int QuantidadeDeCaracteres11 = 11;
         public const int QuantidadeDeCaracteres14 = 14;
+        public const int QuantidadeDeCaracteres100 = 100;
     }
 }

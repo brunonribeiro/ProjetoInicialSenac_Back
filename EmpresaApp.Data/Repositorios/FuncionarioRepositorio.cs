@@ -2,7 +2,6 @@
 using EmpresaApp.Domain.Interfaces.Repositorios;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace EmpresaApp.Data.Repositorios
@@ -26,6 +25,16 @@ namespace EmpresaApp.Data.Repositorios
         public Task<Funcionario> ObterPorNomeAsync(string nome)
         {
             return _context.Funcionarios.FirstOrDefaultAsync(s => s.Nome.ToUpper().Trim() == nome.ToUpper().Trim());
+        }
+
+        public Task<Funcionario> ObterPorCargoIdAsync(int cargoId)
+        {
+            return _context.Funcionarios.FirstOrDefaultAsync(s => s.CargoId == cargoId);
+        }
+
+        public Task<Funcionario> ObterPorEmpresaIdAsync(int empresaId)
+        {
+            return _context.Funcionarios.FirstOrDefaultAsync(s => s.EmpresaId == empresaId);
         }
     }
 }

@@ -7,9 +7,9 @@ namespace EmpressaApp.Domain.Tests.Cargos
 {
     public class CargoTests
     {
+        private readonly Faker _faker;
         private readonly string _descricao;
         private readonly int _tamanhoDeEspacos = 5;
-        private readonly Faker _faker;
         private readonly string _nomeComEspaco = VariaveisDeTeste.TextoComEspacoAntesEDepois;
 
         public CargoTests()
@@ -21,8 +21,11 @@ namespace EmpressaApp.Domain.Tests.Cargos
         [Fact]
         public void DeveCriarCargo()
         {
-            var cargo = new Cargo(_descricao);
-            Assert.Equal(_descricao, cargo.Descricao);
+            var cargoEsperado = CargoBuilder.Novo().Build();
+
+            var cargo = new Cargo(cargoEsperado.Descricao);
+
+            Assert.Equal(cargoEsperado.Descricao, cargo.Descricao);
         }
 
         [Fact]

@@ -9,5 +9,11 @@ namespace EmpresaApp.Domain.Utils
             DateTime.TryParse(texto, out var valor);
             return valor;
         }
+
+        public static string RemoverMascaraCnpj(this string cnpj)
+        {
+            var result = cnpj?.Trim().Replace(".", "").Replace("-", "").Replace("/", "");
+            return result;
+        }
     }
 }

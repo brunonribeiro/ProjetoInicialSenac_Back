@@ -59,7 +59,7 @@ namespace FuncionarioApp.Domain.Services.Armazenadores
         {
             var funcionario = await _funcionarioRepositorio.ObterPorIdAsync(funcionarioId);
 
-            await ValidarFuncionaroNaoCadastrado(funcionario);
+            await ValidarFuncionarioNaoCadastrado(funcionario);
             await ValidarEmpresaNaoCadastrada(empresaId);
 
             if (!NotificacaoDeDominio.HasNotifications())
@@ -72,8 +72,8 @@ namespace FuncionarioApp.Domain.Services.Armazenadores
         {
             var funcionario = await _funcionarioRepositorio.ObterPorIdAsync(funcionarioId);
 
-            await ValidarFuncionaroNaoCadastrado(funcionario);
-            await ValidarFuncionaroComEmpresaCadastrada(funcionario);
+            await ValidarFuncionarioNaoCadastrado(funcionario);
+            await ValidarFuncionarioComEmpresaCadastrada(funcionario);
             await ValidarCargoNaoCadastrado(cargoId);
 
             if (!NotificacaoDeDominio.HasNotifications())
@@ -84,36 +84,36 @@ namespace FuncionarioApp.Domain.Services.Armazenadores
 
         private async Task ValidarFuncionarioComMesmoNome(FuncionarioDto dto)
         {
-            var funcionarioComMesmaNome = await _funcionarioRepositorio.ObterPorNomeAsync(dto.Nome);
+            var funcionarioComMesmoNome = await _funcionarioRepositorio.ObterPorNomeAsync(dto.Nome);
 
-            if (funcionarioComMesmaNome != null && funcionarioComMesmaNome.Id != dto.Id)
+            if (funcionarioComMesmoNome != null && funcionarioComMesmoNome.Id != dto.Id)
                 await NotificarValidacaoDeServico(string.Format(CommonResources.MsgDominioComMesmoNomeNoMasculino, CommonResources.FuncionarioDominio));
         }
 
-        private async Task ValidarFuncionaroNaoCadastrado(Funcionario funcionario)
+        private async Task ValidarFuncionarioNaoCadastrado(Funcionario funcionario)
         {
             if (funcionario == null)
-                await NotificarValidacaoDeServico("O funcionário informado não está cadastrado.");
+                await NotificarValidacaoDeServico(string.Format(CommonResources.MsgDominioNaoCadastradoNoMasculino, CommonResources.FuncionarioDominio));
         }
 
         private async Task ValidarEmpresaNaoCadastrada(int empresaId)
         {
             var empresa = await _empresaRepositorio.ObterPorIdAsync(empresaId);
             if (empresa == null)
-                await NotificarValidacaoDeServico("A empresa informada não está cadastrada.");
+                await NotificarValidacaoDeServico(string.Format(CommonResources.MsgDominioNaoCadastradoNoFeminino, CommonResources.EmpresaDominio));
         }
 
         private async Task ValidarCargoNaoCadastrado(int cargoId)
         {
             var cargo = await _cargoRepositorio.ObterPorIdAsync(cargoId);
             if (cargo == null)
-                await NotificarValidacaoDeServico("O cargo informado não está cadastrado.");
+                await NotificarValidacaoDeServico(string.Format(CommonResources.MsgDominioNaoCadastradoNoMasculino, CommonResources.CargoDominio));
         }
 
-        private async Task ValidarFuncionaroComEmpresaCadastrada(Funcionario funcionario)
+        private async Task ValidarFuncionarioComEmpresaCadastrada(Funcionario funcionario)
         {
             if (!funcionario.EmpresaId.HasValue)
-                await NotificarValidacaoDeServico("O funcionário precisa estar vinculado a uma empresa para atribuir um cargo.");
+                await NotificarValidacaoDeServico(CommonResources.MsgFuncionarioNaoPossuiEmpresaVinculada);
         }
 
     }

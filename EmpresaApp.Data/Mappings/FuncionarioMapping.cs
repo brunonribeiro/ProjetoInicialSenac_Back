@@ -19,11 +19,13 @@ namespace EmpresaApp.Data.Mappings
             builder.HasOne(fun => fun.Empresa)
               .WithMany()
               .HasForeignKey(fun => fun.EmpresaId)
+              .OnDelete(DeleteBehavior.Restrict)
               .IsRequired(false);
 
             builder.HasOne(fun => fun.Cargo)
              .WithMany()
              .HasForeignKey(fun => fun.CargoId)
+             .OnDelete(DeleteBehavior.Restrict)
              .IsRequired(false);
 
             builder.Ignore(fun => fun.CascadeMode);

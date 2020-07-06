@@ -13,13 +13,14 @@ namespace EmpresaApp.Domain.Entitys
         public Empresa(string nome, string cnpj)
         {
             Nome = nome;
-            Cnpj = cnpj;
+            Cnpj = cnpj?.RemoverMascaraCnpj();
         }
         public override bool Validar()
         {
             RuleFor(p => p.Nome)
              .NotEmpty()
-             .NotNull();
+             .NotNull()
+             .MaximumLength(Constantes.QuantidadeDeCaracteres100);
 
             RuleFor(p => p.Cnpj)
                 .NotEmpty()
@@ -37,13 +38,12 @@ namespace EmpresaApp.Domain.Entitys
         }
         public void AlterarCnpj(string cnpj)
         {
-            Cnpj = cnpj.Trim().Replace(".", "").Replace("-", "").Replace("/", "");
+            Cnpj = cnpj?.RemoverMascaraCnpj();
         }
 
         public void AlterarDataFundacao(string dataFundacao)
         {
             DataFundacao = dataFundacao.ToDate();
         }
-
     }
 }
