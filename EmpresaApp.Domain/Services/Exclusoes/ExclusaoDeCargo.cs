@@ -20,7 +20,11 @@ namespace EmpresaApp.Domain.Services.Exclusoes
         public async Task Excluir(int id)
         {
             var cargo = await _cargoRepositorio.ObterPorIdAsync(id);
-            _cargoRepositorio.Remover(cargo);
+
+            if (!NotificacaoDeDominio.HasNotifications())
+            {
+                _cargoRepositorio.Remover(cargo);
+            }
         }
     }
 }

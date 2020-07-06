@@ -11,10 +11,10 @@ namespace EmpresaApp.Domain.Interfaces.Gerais
        where TEntity : class
     {
         Task<IEnumerable<TEntity>> BuscarAsync(Expression<Func<TEntity, bool>> predicate);
-        Task<IEnumerable<TEntity>> BuscarAsyncAsNoTracking(Expression<Func<TEntity, bool>> predicate);
+        //Task<IEnumerable<TEntity>> BuscarAsyncAsNoTracking(Expression<Func<TEntity, bool>> predicate);
         Task<IEnumerable<TEntity>> ListarAsync();
-        Task<IEnumerable<TEntity>> ListarAsyncAsNoTracking();
+        //Task<IEnumerable<TEntity>> ListarAsyncAsNoTracking();
         Task<TEntity> ObterPorIdAsync(TId id);
-        Task<TEntity> ObterPorIdAsyncAsNoTracking(TId id);
+        //Task<TEntity> ObterPorIdAsyncAsNoTracking(TId id);
     }
 }

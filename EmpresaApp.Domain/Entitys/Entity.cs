@@ -8,7 +8,7 @@ namespace EmpresaApp.Domain.Entitys
         where TId : struct
         where TEntity : Entity<TId, TEntity>
     {
-        public TId Id { get; private set; }
+        public TId Id { get; protected set; }
 
         [NotMapped]
         public ValidationResult ValidationResult { get; protected set; }

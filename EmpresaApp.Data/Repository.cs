@@ -29,16 +29,16 @@ namespace EmpresaApp.Data
 
         public void Remover(TEntity obj) => _dbSet.Remove(obj);
 
-        public async Task<IEnumerable<TEntity>> ListarAsyncAsNoTracking() => await _dbSet.AsNoTracking().ToListAsync();
+        //public async Task<IEnumerable<TEntity>> ListarAsyncAsNoTracking() => await _dbSet.AsNoTracking().ToListAsync();
 
         public async Task<IEnumerable<TEntity>> BuscarAsync(Expression<Func<TEntity, bool>> predicate) =>
             await _dbSet.Where(predicate).ToListAsync();
 
-        public async Task<IEnumerable<TEntity>> BuscarAsyncAsNoTracking(Expression<Func<TEntity, bool>> predicate) =>
-            await _dbSet.AsNoTracking().Where(predicate).ToListAsync();
+        //public async Task<IEnumerable<TEntity>> BuscarAsyncAsNoTracking(Expression<Func<TEntity, bool>> predicate) =>
+        //    await _dbSet.AsNoTracking().Where(predicate).ToListAsync();
 
-        public async Task<TEntity> ObterPorIdAsyncAsNoTracking(TId id) =>
-            await _dbSet.AsNoTracking().FirstOrDefaultAsync(e => EqualityComparer<TId>.Default.Equals(e.Id, id));
+        //public async Task<TEntity> ObterPorIdAsyncAsNoTracking(TId id) =>
+        //    await _dbSet.AsNoTracking().FirstOrDefaultAsync(e => EqualityComparer<TId>.Default.Equals(e.Id, id));
 
         public async Task<IEnumerable<TEntity>> ListarAsync() => await _dbSet.ToListAsync();
 
