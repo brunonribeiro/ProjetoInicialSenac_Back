@@ -1,7 +1,10 @@
 ﻿using EmpresaApp.Domain.Base;
+using EmpresaApp.Domain.Entitys;
 using EmpresaApp.Domain.Interfaces.Gerais;
 using EmpresaApp.Domain.Interfaces.Repositorios;
 using EmpresaApp.Domain.Notifications;
+using EmpresaApp.Domain.Utils;
+using System;
 using System.Threading.Tasks;
 
 namespace EmpresaApp.Domain.Services.Exclusoes
@@ -20,7 +23,24 @@ namespace EmpresaApp.Domain.Services.Exclusoes
         public async Task Excluir(int id)
         {
             var funcionario = await _funcionarioRepositorio.ObterPorIdAsync(id);
-            _funcionarioRepositorio.Remover(funcionario);
+
+            if (await VerificarFuncionarioInvalido(funcionario))
+                return;
+
+            if (!NotificacaoDeDominio.HasNotifications())
+            {
+                _funcionarioRepositorio.Remover(funcionario);
+            }
+        }
+
+        private async Task<bool> VerificarFuncionarioInvalido(Funcionario funcionario)
+        {
+            if (funcionario == null)
+            {
+                await NotificarValidacaoDeServico(string.Format(CommonResources.MsgDominioNaoCadastradoNoMasculino, CommonResources.FuncionarioDominio));
+                return true;
+            }
+            return false;
         }
     }
 }

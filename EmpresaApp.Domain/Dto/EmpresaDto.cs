@@ -8,12 +8,10 @@ namespace EmpresaApp.Domain.Dto
     public class EmpresaDto : DtoBase
     {
         [Display(Name = "Nome")]
-        [Required(ErrorMessage = ErrorMsg.Required)]
         public string Nome { get; set; }
 
         [Display(Name = "CNPJ")]
         [CNPJ(ErrorMessage = ErrorMsg.Invalid)]
-        [Required(ErrorMessage = ErrorMsg.Required)]
         public string Cnpj { get; set; }
 
         [Display(Name = "Data da Fundação")]

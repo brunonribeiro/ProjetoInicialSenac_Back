@@ -15,10 +15,9 @@ namespace EmpresaApp.Data.Repositorios
             _context = context;
         }
 
-        public Task<EmpresaDto> ObterPorNomeAsync(string nome)
+        public Task<Empresa> ObterPorNomeAsync(string nome)
         {
-            var result = _context.Empresas.FirstOrDefaultAsync(s => s.Nome.ToUpper().Trim() == nome.ToUpper().Trim());
-            return result.MapTo<Task<EmpresaDto>>();
+            return _context.Empresas.FirstOrDefaultAsync(s => s.Nome.ToUpper().Trim() == nome.ToUpper().Trim());
         }
     }
 }

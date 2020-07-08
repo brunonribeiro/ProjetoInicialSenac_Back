@@ -68,11 +68,11 @@ namespace EmpressaApp.Domain.Tests.Cargos
         [Fact]
         public void NaoDeveEditarCargoComEspacosDepoisEAntesDaDescricao()
         {
-            var segmento = CargoBuilder.Novo().Build();
+            var cargo = CargoBuilder.Novo().Build();
 
-            segmento.AlterarDescricao(_nomeComEspaco);
+            cargo.AlterarDescricao(_nomeComEspaco);
 
-            Assert.Equal(_nomeComEspaco.Trim(), segmento.Descricao);
+            Assert.Equal(_nomeComEspaco.Trim(), cargo.Descricao);
         }
     }
 }

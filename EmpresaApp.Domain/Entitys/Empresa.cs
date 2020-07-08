@@ -13,7 +13,7 @@ namespace EmpresaApp.Domain.Entitys
         public Empresa(string nome, string cnpj)
         {
             Nome = nome;
-            Cnpj = cnpj?.RemoverMascaraCnpj();
+            Cnpj = cnpj?.RemoverMascaraCpfCnpj();
         }
         public override bool Validar()
         {
@@ -38,7 +38,7 @@ namespace EmpresaApp.Domain.Entitys
         }
         public void AlterarCnpj(string cnpj)
         {
-            Cnpj = cnpj?.RemoverMascaraCnpj();
+            Cnpj = cnpj?.RemoverMascaraCpfCnpj();
         }
 
         public void AlterarDataFundacao(string dataFundacao)

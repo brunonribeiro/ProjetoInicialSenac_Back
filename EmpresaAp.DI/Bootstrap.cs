@@ -6,7 +6,7 @@ using EmpresaApp.Domain.Interfaces.Repositorios;
 using EmpresaApp.Domain.Notifications;
 using EmpresaApp.Domain.Services.Armazenadores;
 using EmpresaApp.Domain.Services.Exclusoes;
-using FuncionarioApp.Domain.Services.Armazenadores;
+using EmpresaApp.Domain.Services.Armazenadores;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 

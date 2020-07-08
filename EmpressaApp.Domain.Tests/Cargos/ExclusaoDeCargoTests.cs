@@ -1,6 +1,4 @@
-﻿using Bogus;
-using EmpresaApp.Domain.Base;
-using EmpresaApp.Domain.Entitys;
+﻿using EmpresaApp.Domain.Entitys;
 using EmpresaApp.Domain.Interfaces.Gerais;
 using EmpresaApp.Domain.Interfaces.Repositorios;
 using EmpresaApp.Domain.Notifications;

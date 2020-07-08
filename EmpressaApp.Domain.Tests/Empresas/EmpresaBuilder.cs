@@ -5,8 +5,9 @@ using EmpressaApp.Domain.Tests.Comum;
 
 namespace EmpressaApp.Domain.Tests.Empresas
 {
-    public class EmpresaBuilder
+    public class EmpresaBuilder : BuilderBase
     {
+        private int _id;
         private string _nome;
         private string _cnpj;
         private string _dataFundacao;
@@ -20,6 +21,12 @@ namespace EmpressaApp.Domain.Tests.Empresas
                 _nome = faker.Random.AlphaNumeric(Constantes.QuantidadeDeCaracteres100),
                 _cnpj = faker.Company.Cnpj(false),
             };
+        }
+
+        public EmpresaBuilder ComId(int id)
+        {
+            _id = id;
+            return this;
         }
 
         public EmpresaBuilder ComNome(string nome)
@@ -43,6 +50,8 @@ namespace EmpressaApp.Domain.Tests.Empresas
         public Empresa Build()
         {
             var empresa = new Empresa(_nome, _cnpj);
+
+            AtribuirId(_id, empresa);
 
             if (string.IsNullOrEmpty(_dataFundacao))
                 empresa.AlterarDataFundacao(_dataFundacao);

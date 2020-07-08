@@ -26,7 +26,7 @@ namespace EmpresaApp.Domain.Services.Exclusoes
         {
             var empresa = await _empresaRepositorio.ObterPorIdAsync(id);
 
-            if (await VerificarEmpresaInvalido(empresa))
+            if (await VerificarEmpresaInvalida(empresa))
                 return;
 
             await VerificarEmpresaAtribuidoFuncionario(empresa);
@@ -37,7 +37,7 @@ namespace EmpresaApp.Domain.Services.Exclusoes
             }
         }
 
-        private async Task<bool> VerificarEmpresaInvalido(Empresa empresa)
+        private async Task<bool> VerificarEmpresaInvalida(Empresa empresa)
         {
             if (empresa == null)
             {

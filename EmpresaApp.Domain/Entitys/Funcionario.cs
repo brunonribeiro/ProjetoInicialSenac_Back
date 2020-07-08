@@ -1,7 +1,6 @@
 ﻿using EmpresaApp.Domain.Utils;
 using FluentValidation;
 using System;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EmpresaApp.Domain.Entitys
 {
@@ -18,14 +17,15 @@ namespace EmpresaApp.Domain.Entitys
         public Funcionario(string nome, string cpf)
         {
             Nome = nome;
-            Cpf = cpf;
+            Cpf = cpf?.RemoverMascaraCpfCnpj();
         }
 
         public override bool Validar()
         {
             RuleFor(p => p.Nome)
                .NotEmpty()
-               .NotNull();
+               .NotNull()
+               .MaximumLength(Constantes.QuantidadeDeCaracteres100);
 
             RuleFor(p => p.Cpf)
                 .NotEmpty()
@@ -44,7 +44,7 @@ namespace EmpresaApp.Domain.Entitys
 
         public void AlterarCpf(string cpf)
         {
-            Cpf = cpf.Trim().Replace(".", "").Replace("-", "");
+            Cpf = cpf?.RemoverMascaraCpfCnpj();
         }
 
         public void AlterarDataContratacao(string dataContratacao)

@@ -10,9 +10,9 @@ namespace EmpresaApp.Domain.Utils
             return valor;
         }
 
-        public static string RemoverMascaraCnpj(this string cnpj)
+        public static string RemoverMascaraCpfCnpj(this string cpfCnpj)
         {
-            var result = cnpj?.Trim().Replace(".", "").Replace("-", "").Replace("/", "");
+            var result = cpfCnpj?.Trim().Replace(".", "").Replace("-", "").Replace("/", "");
             return result;
         }
     }

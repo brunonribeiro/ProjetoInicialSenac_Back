@@ -39,14 +39,11 @@ namespace EmpresaApp.Domain.Services.Armazenadores
 
                 empresa.AlterarDataFundacao(dto.DataFundacao);
 
-                if (empresa.Validar() && empresa.Id == 0)
-                {
-                    await _empresaRepositorio.AdicionarAsync(empresa);
-                }
-                else
-                {
+                if (!empresa.Validar())
                     await NotificarValidacoesDeDominio(empresa.ValidationResult);
-                }
+
+                if (empresa.Id == 0)
+                    await _empresaRepositorio.AdicionarAsync(empresa);
             }
         }
 

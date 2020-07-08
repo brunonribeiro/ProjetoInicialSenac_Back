@@ -14,6 +14,7 @@ namespace EmpressaApp.Domain.Tests.Empresas
         private readonly string _cnpj;
         private readonly int _tamanhoDeEspacos = 5;
 
+
         public EmpresaTests()
         {
             _faker = FakerBuilder.Novo().Build();
@@ -159,6 +160,49 @@ namespace EmpressaApp.Domain.Tests.Empresas
             var resultado = empresa.Validar();
 
             Assert.False(resultado);
+        }
+
+        [Fact]
+        public void DeveAlterarNome()
+        {
+            var nome = _faker.Random.Word();
+            var empresa = EmpresaBuilder.Novo().Build();
+
+            empresa.AlterarNome(nome);
+
+            Assert.Equal(nome, empresa.Nome);
+        }
+
+        [Fact]
+        public void NaoDeveEditarFuncionarioComEspacosDepoisEAntesDoNome()
+        {
+            var funcionario = EmpresaBuilder.Novo().Build();
+
+            funcionario.AlterarNome(VariaveisDeTeste.TextoComEspacoAntesEDepois);
+
+            Assert.Equal(VariaveisDeTeste.TextoComEspacoAntesEDepois.Trim(), funcionario.Nome);
+        }
+
+        [Fact]
+        public void DeveAlterarCnpj()
+        {
+            var cnpj = _faker.Company.Cnpj(false);
+            var empresa = EmpresaBuilder.Novo().Build();
+
+            empresa.AlterarCnpj(cnpj);
+
+            Assert.Equal(cnpj, empresa.Cnpj);
+        }
+
+        [Fact]
+        public void DeveAlterarDataFundacao()
+        {
+            var data = _faker.Date.Past();
+            var empresa = EmpresaBuilder.Novo().Build();
+
+            empresa.AlterarDataFundacao(data.ToShortDateString());
+
+            Assert.Equal(data.Date, empresa.DataFundacao.Value.Date);
         }
     }
 }

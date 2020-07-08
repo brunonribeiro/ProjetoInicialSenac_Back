@@ -8,7 +8,7 @@ using EmpresaApp.Domain.Notifications;
 using EmpresaApp.Domain.Utils;
 using System.Threading.Tasks;
 
-namespace FuncionarioApp.Domain.Services.Armazenadores
+namespace EmpresaApp.Domain.Services.Armazenadores
 {
     public class ArmazenadorDeFuncionario : DomainService, IArmazenadorDeFuncionario
     {
@@ -112,7 +112,7 @@ namespace FuncionarioApp.Domain.Services.Armazenadores
 
         private async Task ValidarFuncionarioComEmpresaCadastrada(Funcionario funcionario)
         {
-            if (!funcionario.EmpresaId.HasValue)
+            if (funcionario != null && !funcionario.EmpresaId.HasValue)
                 await NotificarValidacaoDeServico(CommonResources.MsgFuncionarioNaoPossuiEmpresaVinculada);
         }
 
